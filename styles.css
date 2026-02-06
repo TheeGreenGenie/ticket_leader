@@ -22,27 +22,40 @@
     justify-content: center;
     align-items: center;
 }
-
 .dropdown {
     display: none;
 }
-
 div.research > li:hover ~ ul.dropdown.research,
 div.research > ul.dropdown:hover {
     display: block;
 }
-
 div.planning > li:hover ~ ul.dropdown.planning,
 div.planning > ul.dropdown:hover {
     display: block;
 }
-
 div.business > li:hover ~ ul.dropdown.business,
 div.business > ul.dropdown:hover {
     display: block;
 }
-
 div.brand > li:hover ~ ul.dropdown.brand,
 div.brand > ul.dropdown:hover {
     display: block;
+}
+.heroBanner {
+    background-color: darksalmon;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+.lands {
+    background-color: hotpink;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    height: 25vh;
+}
+.lands button {
+    height: 25px;
 }
