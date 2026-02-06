@@ -1,0 +1,48 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 25px;
+    background-color: beige;
+}
+.menubar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    background-color: azure;
+}
+.body {
+    height: 100vh;
+    background-color: aquamarine;
+}
+
+.footer {
+    background-color: yellowgreen;
+    height: 20vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dropdown {
+    display: none;
+}
+
+div.research > li:hover ~ ul.dropdown.research,
+div.research > ul.dropdown:hover {
+    display: block;
+}
+
+div.planning > li:hover ~ ul.dropdown.planning,
+div.planning > ul.dropdown:hover {
+    display: block;
+}
+
+div.business > li:hover ~ ul.dropdown.business,
+div.business > ul.dropdown:hover {
+    display: block;
+}
+
+div.brand > li:hover ~ ul.dropdown.brand,
+div.brand > ul.dropdown:hover {
+    display: block;
+}
