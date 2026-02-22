@@ -1,7 +1,7 @@
 import apiClient from './client';
 
-export async function login(email, password) {
-  const res = await apiClient.post('/auth/login', { email, password });
+export async function login(email, password, captchaToken) {
+  const res = await apiClient.post('/auth/login', { email, password, captchaToken });
   const { token, user } = res.data || {};
   return {
     token,
@@ -12,8 +12,8 @@ export async function login(email, password) {
   };
 }
 
-export async function signup(name, email, password) {
-  const res = await apiClient.post('/auth/signup', { name, email, password });
+export async function signup(name, email, password, captchaToken) {
+  const res = await apiClient.post('/auth/signup', { name, email, password, captchaToken });
   const { token, user } = res.data || {};
   return {
     token,
