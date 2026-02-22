@@ -24,7 +24,12 @@ function signToken(user) {
 }
 
 // ── Helper: verify reCAPTCHA token ───────────────────────────
+const TEST_SECRET = '6LeIxAcTAAAAAGG-vFI1TnRWxMZ5SgjC19UZthAD';
+
 async function verifyCaptcha(token) {
+  if (!token) return false;
+  // Google's test secret key always returns success for any non-empty token
+  if (process.env.RECAPTCHA_SECRET === TEST_SECRET) return true;
   const params = new URLSearchParams({
     secret: process.env.RECAPTCHA_SECRET,
     response: token,

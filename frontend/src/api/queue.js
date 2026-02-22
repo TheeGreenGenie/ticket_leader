@@ -1,7 +1,7 @@
 import apiClient from './client';
 
-export async function joinQueue(eventId, userId = null) {
-  const res = await apiClient.post('/queue/join', { eventId, userId });
+export async function joinQueue(eventId, userId = null, triviaQuestionId = null, triviaAnswer = null) {
+  const res = await apiClient.post('/queue/join', { eventId, userId, triviaQuestionId, triviaAnswer });
   return res.data;
 }
 
