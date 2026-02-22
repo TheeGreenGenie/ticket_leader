@@ -8,6 +8,8 @@ A revolutionary ticketing platform that combines fair queue management with gami
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-010101?logo=socket.io)
 ![Three.js](https://img.shields.io/badge/Three.js-0.183-000000?logo=three.js)
 
+## Live Site Link - https://ticket-leader.vercel.app/live-queue
+
 ## Features
 
 ### Live Queue System
