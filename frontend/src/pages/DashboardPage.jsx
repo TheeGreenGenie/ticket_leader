@@ -7,7 +7,7 @@ import './DashboardPage.css';
 
 const MAX_VISIBLE_GENRES = 6;
 
-const ARTIST_IMAGES = {
+const FALLBACK_ARTIST_IMAGES = {
   'drake':        ['/drake.webp', '/drake2.avif'],
   'taylor-swift': ['/taylor.webp', '/taylor2.webp'],
   'beyonce':      ['/beyonce2.jpg', '/beyonce2.jpeg'],
@@ -153,9 +153,10 @@ export default function DashboardPage() {
                 const artistCount = {};
                 return filteredEvents.map((event, index) => {
                   const slug = event.artistId?.slug;
-                  const images = ARTIST_IMAGES[slug];
-                  let artistImage = null;
-                  if (images) {
+                  const images = FALLBACK_ARTIST_IMAGES[slug];
+                  const apiImage = (event.artistId?.imageUrl || '').trim();
+                  let artistImage = apiImage || null;
+                  if (!artistImage && images) {
                     const count = artistCount[slug] ?? 0;
                     artistImage = images[count % images.length];
                     artistCount[slug] = count + 1;

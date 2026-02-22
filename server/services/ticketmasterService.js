@@ -1,9 +1,11 @@
 const https = require('https');
 const Artist = require('../models/Artist');
 const Event  = require('../models/Event');
+const { fetchLastFmArtistImage } = require('./artistImageService');
 
 const BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 const PAGE_SIZE = 200; // max allowed by Ticketmaster
+const artistImageCache = new Map();
 
 // Slugify a name for use as Artist.slug
 function slugify(name) {
@@ -73,8 +75,22 @@ async function upsertArtist(attraction) {
   if (!name) return null;
 
   const slug     = slugify(name);
-  const imageUrl = pickImage(attraction.images);
+  let imageUrl   = pickImage(attraction.images);
   const genre    = buildGenre(attraction.classifications);
+
+  if (!imageUrl) {
+    if (artistImageCache.has(slug)) {
+      imageUrl = artistImageCache.get(slug);
+    } else {
+      try {
+        const fallbackImage = await fetchLastFmArtistImage(name);
+        imageUrl = fallbackImage || '';
+      } catch (_err) {
+        imageUrl = '';
+      }
+      artistImageCache.set(slug, imageUrl);
+    }
+  }
 
   const artist = await Artist.findOneAndUpdate(
     { slug },

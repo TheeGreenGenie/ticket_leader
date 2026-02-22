@@ -4,7 +4,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { login, signup } from '../api/auth';
 import './LoginPage.css';
 
-const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 const CAPTCHA_ENABLED = Boolean(SITE_KEY);
 
 export default function LoginPage() {
@@ -140,6 +140,14 @@ export default function LoginPage() {
               <p>{mode === 'login' ? 'Sign in to access your tickets and events.' : 'Join the waitlist revolution today.'}</p>
 
               <form className="auth-form" onSubmit={handleSubmit}>
+                {!CAPTCHA_ENABLED && (
+                  <div className="form-error">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    reCAPTCHA is not configured. Set `VITE_RECAPTCHA_SITE_KEY`.
+                  </div>
+                )}
                 {mode === 'signup' && (
                   <div className="form-group">
                     <label className="form-label">Full Name</label>
@@ -182,12 +190,14 @@ export default function LoginPage() {
                 </div>
 
                 <div style={{ marginBottom: 12 }}>
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={SITE_KEY}
-                    onChange={() => setCaptchaPassed(true)}
-                    onExpired={() => setCaptchaPassed(false)}
-                  />
+                  {CAPTCHA_ENABLED && (
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={SITE_KEY}
+                      onChange={() => setCaptchaPassed(true)}
+                      onExpired={() => setCaptchaPassed(false)}
+                    />
+                  )}
                 </div>
 
                 {error && (
@@ -202,7 +212,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   className="btn-submit"
-                  disabled={loading || (CAPTCHA_ENABLED && !captchaPassed)}
+                  disabled={loading || !CAPTCHA_ENABLED || !captchaPassed}
                 >
                   {loading ? (
                     <>
