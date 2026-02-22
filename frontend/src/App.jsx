@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage';
 import LiveQueuePage from './pages/LiveQueuePage';
 import MyTicketsPage from './pages/MyTicketsPage';
 import StadiumPage from './pages/StadiumPage';
+import WalkthroughPage from './pages/WalkthroughPage';
 import VerifyPage from './pages/VerifyPage';
 import BlockedPage from './pages/BlockedPage';
 
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/dashboard" element={<Navigate to="/live-queue" replace />} />
         <Route path="/queue/:eventId" element={<LiveQueuePage />} />
         <Route path="/stadium" element={<StadiumPage />} />
+        <Route path="/walkthrough" element={<WalkthroughPage />} />
         <Route path="/verify" element={<VerifyPage />} />
         <Route path="/blocked" element={<BlockedPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

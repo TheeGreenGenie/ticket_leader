@@ -156,6 +156,114 @@ Categories to use: albums, tours, songs, collaborations, awards, personal, fan_c
       keys: Array.from(this.cache.keys())
     };
   }
+
+  /**
+   * Generate location-themed trivia about an artist's connection to a specific city
+   * @param {string} artistName - The artist's name
+   * @param {string} fanCity - The fan's city
+   * @param {number} count - Number of questions (default 2)
+   * @returns {Promise<Array>} Array of trivia questions
+   */
+  async generateLocalTrivia(artistName, fanCity, count = 2) {
+    if (!this.isAvailable()) {
+      throw new Error('Gemini service not initialized');
+    }
+
+    // Use shorter cache for local trivia (15 minutes)
+    const cacheKey = `local-trivia-${artistName}-${fanCity}-${count}`;
+    const cached = this.getFromCache(cacheKey);
+    if (cached) {
+      console.log(`Returning cached local trivia for ${artistName} in ${fanCity}`);
+      return cached;
+    }
+
+    const prompt = this.buildLocalTriviaPrompt(artistName, fanCity, count);
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      const questions = this.parseLocalQuestions(text, artistName, fanCity);
+
+      // Cache the results (shorter TTL for local trivia)
+      this.setCache(cacheKey, questions);
+
+      console.log(`Generated ${questions.length} local trivia questions for ${artistName} in ${fanCity}`);
+      return questions;
+    } catch (error) {
+      console.error('Gemini local trivia error:', error.message);
+      throw error;
+    }
+  }
+
+  buildLocalTriviaPrompt(artistName, fanCity, count) {
+    return `Generate ${count} trivia questions about ${artistName}'s connection to ${fanCity}.
+
+Focus on:
+- Past concerts or tours that stopped in ${fanCity}
+- Shoutouts to ${fanCity} in songs or interviews
+- Local collaborations with artists from ${fanCity}
+- Memorable moments at ${fanCity} venues
+- If the artist is FROM ${fanCity}, include hometown facts
+
+If ${artistName} has no strong connection to ${fanCity}:
+- Ask about the CLOSEST major city the artist has performed in
+- Or ask about the artist's connection to the broader region/state
+
+Requirements:
+- Each question must have exactly 4 options
+- Questions should feel personal and localized
+- Make the fan feel special for being from ${fanCity}
+- Ensure correct_index is a number between 0 and 3
+
+Return ONLY valid JSON with this exact structure (no markdown, no code blocks):
+[
+  {
+    "question": "What year did ${artistName} last perform in ${fanCity}?",
+    "options": ["2019", "2020", "2021", "2022"],
+    "correct_index": 2,
+    "difficulty": "medium",
+    "local_context": "Brief note about why this is relevant to the city"
+  }
+]`;
+  }
+
+  parseLocalQuestions(text, artistName, fanCity) {
+    // Remove any markdown code blocks if present
+    let cleaned = text.trim();
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    }
+
+    // Try to extract JSON array if there's extra text
+    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      cleaned = jsonMatch[0];
+    }
+
+    const parsed = JSON.parse(cleaned);
+
+    if (!Array.isArray(parsed)) {
+      throw new Error('Response is not an array');
+    }
+
+    // Transform to match our schema with local-specific fields
+    return parsed.map((q, index) => ({
+      _id: `gemini-local-${Date.now()}-${index}`,
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correct_index,
+      difficulty: q.difficulty || 'medium',
+      category: 'local',
+      trustBoost: 8, // Bonus points for local trivia
+      isGenerated: true,
+      isLocalTrivia: true,
+      artistName: artistName,
+      fanCity: fanCity,
+      localContext: q.local_context || null
+    }));
+  }
 }
 
 // Export singleton instance

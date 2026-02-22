@@ -4,6 +4,10 @@
     "eventName": "The Eras Tour",
     "venue": "MetLife Stadium",
     "city": "East Rutherford, NJ",
+    "coordinates": {
+      "lat": 40.8128,
+      "lng": -74.0742
+    },
     "date": "2026-06-15T19:00:00.000Z",
     "queueCapacity": 10000,
     "isActive": true
@@ -13,6 +17,10 @@
     "eventName": "The Eras Tour",
     "venue": "SoFi Stadium",
     "city": "Los Angeles, CA",
+    "coordinates": {
+      "lat": 33.9535,
+      "lng": -118.3390
+    },
     "date": "2026-07-20T19:00:00.000Z",
     "queueCapacity": 12000,
     "isActive": true
@@ -22,6 +30,10 @@
     "eventName": "It's All a Blur Tour",
     "venue": "Scotiabank Arena",
     "city": "Toronto, ON",
+    "coordinates": {
+      "lat": 43.6435,
+      "lng": -79.3791
+    },
     "date": "2026-05-10T20:00:00.000Z",
     "queueCapacity": 8000,
     "isActive": true
@@ -31,6 +43,10 @@
     "eventName": "It's All a Blur Tour",
     "venue": "Madison Square Garden",
     "city": "New York, NY",
+    "coordinates": {
+      "lat": 40.7505,
+      "lng": -73.9934
+    },
     "date": "2026-06-05T20:00:00.000Z",
     "queueCapacity": 9000,
     "isActive": true
@@ -40,6 +56,10 @@
     "eventName": "Renaissance World Tour",
     "venue": "State Farm Arena",
     "city": "Atlanta, GA",
+    "coordinates": {
+      "lat": 33.7573,
+      "lng": -84.3963
+    },
     "date": "2026-08-12T19:30:00.000Z",
     "queueCapacity": 11000,
     "isActive": true
@@ -49,6 +69,10 @@
     "eventName": "Renaissance World Tour",
     "venue": "Soldier Field",
     "city": "Chicago, IL",
+    "coordinates": {
+      "lat": 41.8623,
+      "lng": -87.6167
+    },
     "date": "2026-08-25T19:30:00.000Z",
     "queueCapacity": 10000,
     "isActive": true

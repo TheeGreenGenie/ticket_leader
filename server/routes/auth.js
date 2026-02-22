@@ -24,11 +24,15 @@ function signToken(user) {
 }
 
 // ── Helper: verify reCAPTCHA token ───────────────────────────
+const TEST_SECRET = '6LeIxAcTAAAAAGG-vFI1TnRWxMZ5SgjC19UZthAD';
+
 async function verifyCaptcha(token) {
   const secret = process.env.RECAPTCHA_SECRET;
   // If no official secret is configured, CAPTCHA is disabled.
   if (!secret) return true;
   if (!token) return false;
+  // Google's test secret key always returns success for any non-empty token
+  if (secret === TEST_SECRET) return true;
   const params = new URLSearchParams({
     secret,
     response: token,
@@ -100,4 +104,3 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
-
