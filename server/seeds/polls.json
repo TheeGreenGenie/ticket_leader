@@ -1,0 +1,136 @@
+[
+  {
+    "artistSlug": "taylor-swift",
+    "question": "What's your favorite Taylor Swift era?",
+    "type": "single-choice",
+    "options": ["Fearless", "Red", "1989", "Folklore/Evermore", "Midnights"],
+    "category": "preference",
+    "mockResults": {
+      "Fearless": 18,
+      "Red": 25,
+      "1989": 22,
+      "Folklore/Evermore": 28,
+      "Midnights": 15
+    }
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Rate your excitement for The Eras Tour on a scale of 1-10",
+    "type": "slider",
+    "sliderRange": { "min": 1, "max": 10 },
+    "category": "engagement"
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Which Taylor Swift collab is your favorite?",
+    "type": "single-choice",
+    "options": ["Ice Spice - Karma", "Ed Sheeran - Everything Has Changed", "Bon Iver - Exile", "HAIM - No Body No Crime"],
+    "category": "songs",
+    "mockResults": {
+      "Ice Spice - Karma": 15,
+      "Ed Sheeran - Everything Has Changed": 20,
+      "Bon Iver - Exile": 35,
+      "HAIM - No Body No Crime": 30
+    }
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "How many Taylor Swift concerts have you attended?",
+    "type": "single-choice",
+    "options": ["This will be my first!", "1-2", "3-5", "More than 5"],
+    "category": "fandom",
+    "mockResults": {
+      "This will be my first!": 45,
+      "1-2": 30,
+      "3-5": 18,
+      "More than 5": 7
+    }
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "How would you rate 'All Too Well (10 Minute Version)'?",
+    "type": "slider",
+    "sliderRange": { "min": 1, "max": 10 },
+    "category": "songs"
+  },
+  {
+    "artistSlug": "drake",
+    "question": "What's your favorite Drake album?",
+    "type": "single-choice",
+    "options": ["Take Care", "Nothing Was The Same", "Views", "Scorpion", "Certified Lover Boy"],
+    "category": "preference",
+    "mockResults": {
+      "Take Care": 35,
+      "Nothing Was The Same": 30,
+      "Views": 18,
+      "Scorpion": 10,
+      "Certified Lover Boy": 7
+    }
+  },
+  {
+    "artistSlug": "drake",
+    "question": "Rate your excitement for this Drake concert (1-10)",
+    "type": "slider",
+    "sliderRange": { "min": 1, "max": 10 },
+    "category": "engagement"
+  },
+  {
+    "artistSlug": "drake",
+    "question": "Which Drake era do you prefer?",
+    "type": "single-choice",
+    "options": ["Young Money Drake", "YMCMB Era", "OVO Sound Era", "Current Drake"],
+    "category": "preference",
+    "mockResults": {
+      "Young Money Drake": 25,
+      "YMCMB Era": 30,
+      "OVO Sound Era": 28,
+      "Current Drake": 17
+    }
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "What's your favorite Beyoncé album?",
+    "type": "single-choice",
+    "options": ["Dangerously in Love", "B'Day", "Lemonade", "Renaissance"],
+    "category": "preference",
+    "mockResults": {
+      "Dangerously in Love": 15,
+      "B'Day": 20,
+      "Lemonade": 40,
+      "Renaissance": 25
+    }
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "Rate Beyoncé's Coachella 2018 performance (Homecoming) on a scale of 1-10",
+    "type": "slider",
+    "sliderRange": { "min": 1, "max": 10 },
+    "category": "performance"
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "Which Beyoncé collaboration is your favorite?",
+    "type": "single-choice",
+    "options": ["Crazy In Love (ft. Jay-Z)", "Savage Remix (ft. Megan Thee Stallion)", "Perfect Duet (ft. Ed Sheeran)", "Beautiful Liar (ft. Shakira)"],
+    "category": "songs",
+    "mockResults": {
+      "Crazy In Love (ft. Jay-Z)": 45,
+      "Savage Remix (ft. Megan Thee Stallion)": 25,
+      "Perfect Duet (ft. Ed Sheeran)": 18,
+      "Beautiful Liar (ft. Shakira)": 12
+    }
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "How many times have you seen Beyoncé live?",
+    "type": "single-choice",
+    "options": ["Never (this is my first!)", "1-2 times", "3-5 times", "More than 5 times"],
+    "category": "fandom",
+    "mockResults": {
+      "Never (this is my first!)": 40,
+      "1-2 times": 35,
+      "3-5 times": 18,
+      "More than 5 times": 7
+    }
+  }
+]

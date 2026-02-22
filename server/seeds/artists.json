@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Taylor Swift",
+    "slug": "taylor-swift",
+    "imageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+    "bio": "Taylor Alison Swift is an American singer-songwriter. Known for her biographical songwriting, artistic reinventions, and cultural impact, Swift is a leading figure in popular music.",
+    "genre": "Pop, Country"
+  },
+  {
+    "name": "Drake",
+    "slug": "drake",
+    "imageUrl": "https://images.unsplash.com/photo-1571330735066-03aaa9429d89",
+    "bio": "Aubrey Drake Graham is a Canadian rapper, singer, and actor. An influential figure in popular music, he has been credited with popularizing R&B sensibilities in hip hop.",
+    "genre": "Hip-Hop, R&B"
+  },
+  {
+    "name": "Beyoncé",
+    "slug": "beyonce",
+    "imageUrl": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
+    "bio": "Beyoncé Giselle Knowles-Carter is an American singer, songwriter, and businesswoman. Nicknamed 'Queen Bey', she is regarded as one of the most influential cultural figures of the 21st century.",
+    "genre": "Pop, R&B"
+  }
+]
