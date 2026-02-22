@@ -168,6 +168,60 @@ router.get('/artists/:artistId/polls', async (req, res) => {
 });
 
 /**
+ * GET /api/content/artists/:artistId/trivia/local
+ * Get location-themed trivia about an artist's connection to a fan's city
+ * Query params:
+ *   - city: fan's city (required)
+ *   - count: number of questions (default 2)
+ */
+router.get('/artists/:artistId/trivia/local', async (req, res) => {
+  try {
+    const { artistId } = req.params;
+    const { city, count = 2 } = req.query;
+
+    if (!city) {
+      return res.status(400).json({ error: 'City parameter is required' });
+    }
+
+    if (!geminiService.isAvailable()) {
+      return res.status(503).json({
+        error: 'AI trivia generation not available',
+        fallback: true
+      });
+    }
+
+    const artist = await Artist.findById(artistId);
+    if (!artist) {
+      return res.status(404).json({ error: 'Artist not found' });
+    }
+
+    try {
+      const questions = await geminiService.generateLocalTrivia(
+        artist.name,
+        city,
+        parseInt(count)
+      );
+
+      res.json(questions.map(q => ({ ...q, artistId })));
+    } catch (aiError) {
+      console.warn('Local trivia generation failed:', aiError.message);
+
+      // Fall back to regular trivia if local generation fails
+      const regularTrivia = await geminiService.generateTrivia(
+        artist.name,
+        parseInt(count),
+        'medium'
+      );
+
+      res.json(regularTrivia.map(q => ({ ...q, artistId, isFallback: true })));
+    }
+  } catch (error) {
+    console.error('Get local trivia error:', error);
+    res.status(500).json({ error: 'Failed to fetch local trivia questions' });
+  }
+});
+
+/**
  * GET /api/content/events
  * Get all active events
  */
