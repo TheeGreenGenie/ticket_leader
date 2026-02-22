@@ -1,0 +1,182 @@
+[
+  {
+    "artistSlug": "taylor-swift",
+    "question": "What year did Taylor Swift release her debut album?",
+    "options": ["2004", "2006", "2008", "2010"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "category": "discography",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Which album features the song 'All Too Well (10 Minute Version)'?",
+    "options": ["1989", "Reputation", "Red (Taylor's Version)", "Folklore"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "category": "songs",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "How many Grammy Awards has Taylor Swift won as of 2024?",
+    "options": ["10", "12", "14", "16"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "category": "awards",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "What is the name of Taylor Swift's re-recording project series?",
+    "options": ["Taylor's Editions", "Swift's Versions", "Taylor's Version", "The Re-Records"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "category": "general",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Which album marked Taylor Swift's full transition to pop music?",
+    "options": ["Red", "1989", "Speak Now", "Fearless"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "category": "discography",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "What was the original release year of the 'Fearless' album?",
+    "options": ["2006", "2008", "2010", "2012"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "category": "discography",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Which album was surprise-released during the COVID-19 pandemic?",
+    "options": ["Lover", "Folklore", "Midnights", "Evermore"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "category": "discography",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Who produced the albums 'Folklore' and 'Evermore' with Taylor?",
+    "options": ["Max Martin", "Jack Antonoff", "Aaron Dessner", "Both B and C"],
+    "correctAnswer": 3,
+    "difficulty": "hard",
+    "category": "collaborations",
+    "trustBoost": 15
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "What is Taylor Swift's middle name?",
+    "options": ["Anne", "Marie", "Alison", "Grace"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "category": "general",
+    "trustBoost": 15
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "question": "Which tour became the highest-grossing concert tour of all time?",
+    "options": ["Reputation Stadium Tour", "The Eras Tour", "1989 World Tour", "Speak Now World Tour"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "category": "tours",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "drake",
+    "question": "What is Drake's full name?",
+    "options": ["Aubrey Drake Graham", "Drake Aubrey Williams", "Aubrey Drake Williams", "Drake Graham James"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "category": "general",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "drake",
+    "question": "Which TV show did Drake appear in before his music career?",
+    "options": ["Fresh Prince", "Degrassi: The Next Generation", "The O.C.", "One Tree Hill"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "category": "general",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "drake",
+    "question": "What year was Drake's debut album 'Thank Me Later' released?",
+    "options": ["2008", "2009", "2010", "2011"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "category": "discography",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "drake",
+    "question": "Which Drake album features the song 'Hotline Bling'?",
+    "options": ["Views", "If You're Reading This", "More Life", "Scorpion"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "category": "songs",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "drake",
+    "question": "What city is Drake from?",
+    "options": ["Vancouver", "Montreal", "Toronto", "Ottawa"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "category": "general",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "What girl group was Beyoncé originally part of?",
+    "options": ["TLC", "En Vogue", "Destiny's Child", "SWV"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "category": "general",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "What year did Beyoncé release her visual album 'Lemonade'?",
+    "options": ["2014", "2015", "2016", "2017"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "category": "discography",
+    "trustBoost": 10
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "Which Beyoncé album was surprise-released on iTunes in 2013?",
+    "options": ["4", "BEYONCÉ", "Lemonade", "Renaissance"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "category": "discography",
+    "trustBoost": 5
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "How many Grammy Awards has Beyoncé won (as of 2024)?",
+    "options": ["28", "30", "32", "34"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "category": "awards",
+    "trustBoost": 15
+  },
+  {
+    "artistSlug": "beyonce",
+    "question": "What is the name of Beyoncé's husband?",
+    "options": ["Jay-Z", "Kanye West", "Drake", "Usher"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "category": "general",
+    "trustBoost": 5
+  }
+]
