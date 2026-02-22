@@ -3,6 +3,8 @@ const router = express.Router();
 const queueManager = require('../services/queueManager');
 const QueueSession = require('../models/QueueSession');
 const Event = require('../models/Event');
+const TriviaQuestion = require('../models/TriviaQuestion');
+const QueueSession = require('../models/QueueSession');
 
 /**
  * POST /api/queue/join
@@ -10,13 +12,34 @@ const Event = require('../models/Event');
  */
 router.post('/join', async (req, res) => {
   try {
-    const { eventId, userId } = req.body;
+    const { eventId, userId, triviaQuestionId, triviaAnswer } = req.body;
 
     if (!eventId) {
       return res.status(400).json({ error: 'Event ID is required' });
     }
 
-    const result = await queueManager.joinQueue(eventId, userId);
+    // Layer 2: Trivia gate — verify answer before allowing queue join
+    if (!triviaQuestionId || triviaAnswer === null || triviaAnswer === undefined) {
+      return res.status(403).json({ message: 'Trivia verification required.' });
+    }
+    const gateQuestion = await TriviaQuestion.findById(triviaQuestionId);
+    if (!gateQuestion || parseInt(triviaAnswer) !== gateQuestion.correctAnswer) {
+      return res.status(403).json({ message: 'Incorrect answer. Please try again.' });
+    }
+
+    // Layer 3: IP flagging — detect multiple sessions for the SAME event from one IP
+    // (joining different events is normal; joining the same event many times is a bot)
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+    const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const ipCount = await QueueSession.countDocuments({
+      ipAddress: ip,
+      eventId,
+      joinedAt: { $gte: fifteenMinAgo },
+      status: { $in: ['waiting', 'active'] }
+    });
+    const isSuspiciousIp = ipCount >= 3;
+
+    const result = await queueManager.joinQueue(eventId, userId, ip, isSuspiciousIp);
 
     res.json({
       success: true,

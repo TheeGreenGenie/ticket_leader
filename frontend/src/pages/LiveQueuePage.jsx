@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { joinQueue, getQueueStatus, leaveQueue, saveLocation } from '../api/queue';
 import { getEvent, getTrivia, getPolls, getLocalTrivia } from '../api/content';
@@ -28,9 +28,19 @@ export default function LiveQueuePage() {
   const [locationData, setLocationData] = useState(null);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [locationChecked, setLocationChecked] = useState(false);
+  // Trivia gate state
+  const [gatePhase, setGatePhase] = useState('loading'); // 'loading' | 'trivia' | 'joined'
+  const [gateQuestion, setGateQuestion] = useState(null);
+  const [gateError, setGateError] = useState('');
+  const [gateAnswering, setGateAnswering] = useState(false);
+
+  // Bot detection: track wrong attempts and response speed
+  const [triviaWrongAttempts, setTriviaWrongAttempts] = useState(0);
+  const [fastWrongAttempts, setFastWrongAttempts] = useState(0);
+  const gateQuestionShownAt = useRef(null);
 
   // Game state
-  const [activeGame, setActiveGame] = useState(null); // 'trivia', 'poll', or null
+  const [activeGame, setActiveGame] = useState(null);
   const [triviaQuestions, setTriviaQuestions] = useState([]);
   const [pollQuestions, setPollQuestions] = useState([]);
   const [gamesLoading, setGamesLoading] = useState(false);
@@ -39,47 +49,48 @@ export default function LiveQueuePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize queue session
+  // Initialize: load event, check for existing session or show trivia gate
   useEffect(() => {
-    async function initializeQueue() {
+    async function initialize() {
       try {
         setLoading(true);
         setError(null);
 
-        // Get event details
         const eventData = await getEvent(eventId);
         setEvent(eventData);
-        setArtistId(eventData.artistId._id || eventData.artistId);
+        const aid = eventData.artistId._id || eventData.artistId;
+        setArtistId(aid);
 
-        // Check for existing session
+        // If user already has a session for this event, skip the gate
         const savedSession = localStorage.getItem(`queue_session_${eventId}`);
-        let session;
-
         if (savedSession) {
           try {
-            session = await getQueueStatus(savedSession);
+            const session = await getQueueStatus(savedSession);
             setSessionId(savedSession);
             // Restore location data if available
             if (session.locationData?.granted) {
               setLocationData(session.locationData);
               setLocationChecked(true);
             }
+            setQueueData(session);
+            socketService.connect(savedSession);
+            behaviorCollector.start(savedSession);
+            setGatePhase('joined');
+            return;
           } catch {
-            // Session expired, join new
             localStorage.removeItem(`queue_session_${eventId}`);
-            session = await joinNewQueue();
           }
-        } else {
-          session = await joinNewQueue();
         }
 
-        setQueueData(session);
-
-        // Connect socket and start behavior collection
-        if (session.sessionId || savedSession) {
-          const sid = session.sessionId || savedSession;
-          socketService.connect(sid);
-          behaviorCollector.start(sid);
+        // No existing session — fetch a gate trivia question
+        const questions = await getTrivia(aid, { limit: 1, useAI: false });
+        if (questions && questions.length > 0) {
+          setGateQuestion(questions[0]);
+          gateQuestionShownAt.current = Date.now();
+          setGatePhase('trivia');
+        } else {
+          // No trivia available — skip gate and join directly
+          await joinNewQueue(null, null, 0, 0);
         }
 
         // Show location prompt after a short delay if not already checked
@@ -90,22 +101,14 @@ export default function LiveQueuePage() {
         }
       } catch (err) {
         console.error('Failed to initialize queue:', err);
-        setError(err.message || 'Failed to join queue');
+        setError(err.message || 'Failed to load event');
       } finally {
         setLoading(false);
       }
     }
 
-    async function joinNewQueue() {
-      const userId = localStorage.getItem('userId');
-      const result = await joinQueue(eventId, userId);
-      setSessionId(result.sessionId);
-      localStorage.setItem(`queue_session_${eventId}`, result.sessionId);
-      return result;
-    }
-
     if (eventId) {
-      initializeQueue();
+      initialize();
     }
 
     return () => {
@@ -113,6 +116,66 @@ export default function LiveQueuePage() {
       behaviorCollector.stop();
     };
   }, [eventId]);
+
+  async function joinNewQueue(triviaQuestionId, triviaAnswer, wrongAttempts, fastAttempts) {
+    const userId = localStorage.getItem('userId');
+    const result = await joinQueue(eventId, userId, triviaQuestionId, triviaAnswer);
+    setSessionId(result.sessionId);
+    localStorage.setItem(`queue_session_${eventId}`, result.sessionId);
+    setQueueData(result);
+    socketService.connect(result.sessionId);
+    behaviorCollector.start(result.sessionId);
+
+    // Check all 3 bot-detection flags
+    const allFlagged = result.isFlagged
+      && (fastAttempts >= 1)
+      && (wrongAttempts >= 2);
+
+    if (allFlagged) {
+      navigate(`/verify?returnTo=/queue/${eventId}`);
+      return;
+    }
+
+    setGatePhase('joined');
+    return result;
+  }
+
+  async function handleGateAnswer(answerIndex) {
+    if (!gateQuestion || gateAnswering) return;
+
+    // Measure response time since question was shown
+    const responseTime = Date.now() - (gateQuestionShownAt.current || Date.now());
+
+    setGateAnswering(true);
+    setGateError('');
+    try {
+      await joinNewQueue(gateQuestion._id, answerIndex, triviaWrongAttempts, fastWrongAttempts);
+    } catch (err) {
+      const msg = err?.response?.data?.message || err.message || 'Something went wrong.';
+      if (err?.response?.status === 403) {
+        // Wrong answer — update counters
+        const newWrong = triviaWrongAttempts + 1;
+        const newFast = responseTime < 1500 ? fastWrongAttempts + 1 : fastWrongAttempts;
+        setTriviaWrongAttempts(newWrong);
+        setFastWrongAttempts(newFast);
+
+        setGateError(msg + ' Try this new question.');
+        try {
+          const fresh = await getTrivia(artistId, { limit: 1, useAI: false });
+          if (fresh && fresh.length > 0) {
+            setGateQuestion(fresh[0]);
+            gateQuestionShownAt.current = Date.now();
+          }
+        } catch {
+          // keep same question if fetch fails
+        }
+      } else {
+        setError(msg);
+      }
+    } finally {
+      setGateAnswering(false);
+    }
+  }
 
   // Socket event listeners
   useEffect(() => {
@@ -172,6 +235,7 @@ export default function LiveQueuePage() {
   };
 
   // Load game content - with local trivia support
+  // Load game content
   const loadGameContent = useCallback(async (gameType) => {
     if (!artistId) return;
 
@@ -200,6 +264,7 @@ export default function LiveQueuePage() {
 
         // Shuffle to mix local and regular
         trivia.sort(() => Math.random() - 0.5);
+        const trivia = await getTrivia(artistId, { limit: 5, useAI: true });
         setTriviaQuestions(trivia);
       } else if (gameType === 'poll' && pollQuestions.length === 0) {
         const polls = await getPolls(artistId, 3);
@@ -254,7 +319,7 @@ export default function LiveQueuePage() {
         <main className="queue-main">
           <div className="loading-container">
             <div className="loading-spinner" />
-            <p>Joining queue...</p>
+            <p>Loading event...</p>
           </div>
         </main>
         <Footer />
@@ -280,6 +345,69 @@ export default function LiveQueuePage() {
     );
   }
 
+  // ── Trivia Gate Screen ────────────────────────────────────────
+  if (gatePhase === 'trivia') {
+    return (
+      <div className="queue-page">
+        <Header />
+        <main className="queue-main">
+          <div className="queue-container">
+            <div className="trivia-gate">
+              <div className="trivia-gate-header">
+                <span className="gate-icon">🔒</span>
+                <h2>Prove you're human</h2>
+                <p>Answer this question about <strong>{event?.artistId?.name || 'the artist'}</strong> to join the queue.</p>
+              </div>
+
+              {gateQuestion ? (
+                <>
+                  <div className="gate-question">
+                    <p>{gateQuestion.question}</p>
+                  </div>
+
+                  <div className="gate-options">
+                    {gateQuestion.options.map((option, index) => (
+                      <button
+                        key={index}
+                        className="gate-option-btn"
+                        onClick={() => handleGateAnswer(index)}
+                        disabled={gateAnswering}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+
+                  {gateError && (
+                    <p className="gate-error">{gateError}</p>
+                  )}
+
+                  {gateAnswering && (
+                    <div className="gate-loading">
+                      <div className="loading-spinner" />
+                      <p>Verifying...</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="gate-loading">
+                  <div className="loading-spinner" />
+                  <p>Loading question...</p>
+                </div>
+              )}
+
+              <button className="back-to-menu" onClick={() => navigate('/dashboard')}>
+                Back to Dashboard
+              </button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ── Queue UI (after passing gate) ────────────────────────────
   return (
     <div className="queue-page">
       <Header />
@@ -290,6 +418,10 @@ export default function LiveQueuePage() {
             <section className="location-badge-section">
               <LocalFanBadge locationData={locationData} />
             </section>
+          {queueData?.isFlagged && (
+            <div className="flag-warning">
+              ⚠️ Suspicious activity detected from your network. Your queue position has been adjusted.
+            </div>
           )}
 
           {/* Queue Status Section */}

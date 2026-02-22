@@ -6,7 +6,7 @@ class QueueManager {
   /**
    * Add a user to the queue for an event
    */
-  async joinQueue(eventId, userId = null) {
+  async joinQueue(eventId, userId = null, ip = null, isSuspiciousIp = false) {
     // Check if event exists and is active
     const event = await Event.findById(eventId);
     if (!event) {
@@ -50,7 +50,8 @@ class QueueManager {
       currentPosition,
       trustScore: 50,
       trustLevel: 'silver',
-      status: 'waiting'
+      status: 'waiting',
+      ipAddress: ip
     };
 
     if (userId && userId !== 'null' && userId !== 'undefined') {
@@ -61,6 +62,15 @@ class QueueManager {
 
     await session.save();
 
+    // Apply IP flag penalty if suspicious
+    if (isSuspiciousIp) {
+      session.isFlagged = true;
+      session.flagReasons.push('Multiple sessions from same IP in 15 minutes');
+      session.trustScore = Math.max(0, session.trustScore - 20);
+      session.updateTrustLevel();
+      await session.save();
+    }
+
     // Update event queue size
     event.currentQueueSize += 1;
     await event.save();
@@ -69,8 +79,9 @@ class QueueManager {
       sessionId,
       position: currentPosition,
       estimatedWait: this.calculateEstimatedWait(currentPosition),
-      trustScore: 50,
-      trustLevel: 'silver'
+      trustScore: session.trustScore,
+      trustLevel: session.trustLevel,
+      isFlagged: session.isFlagged
     };
   }
 

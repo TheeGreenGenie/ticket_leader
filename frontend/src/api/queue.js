@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const API = axios.create({ baseURL: '/api/queue' });
 
-export async function joinQueue(eventId, userId = null) {
-  const res = await API.post('/join', { eventId, userId });
+export async function joinQueue(eventId, userId = null, triviaQuestionId = null, triviaAnswer = null) {
+  const res = await API.post('/join', { eventId, userId, triviaQuestionId, triviaAnswer });
   return res.data;
 }
 
