@@ -13,7 +13,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate]);
 

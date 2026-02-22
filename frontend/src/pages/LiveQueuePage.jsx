@@ -114,7 +114,7 @@ export default function LiveQueuePage() {
 
     const unsubAdvance = socketService.on('advance', () => {
       alert('Congratulations! You can now purchase tickets!');
-      navigate('/dashboard');
+      navigate('/live-queue');
     });
 
     return () => {
@@ -174,7 +174,7 @@ export default function LiveQueuePage() {
       localStorage.removeItem(`queue_session_${eventId}`);
       socketService.disconnect();
       behaviorCollector.stop();
-      navigate('/dashboard');
+      navigate('/live-queue');
     } catch (err) {
       console.error('Failed to leave queue:', err);
     }
@@ -203,8 +203,8 @@ export default function LiveQueuePage() {
           <div className="error-container">
             <h2>Oops!</h2>
             <p>{error}</p>
-            <button onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
+            <button onClick={() => navigate('/live-queue')}>
+              Back to Live Queue
             </button>
           </div>
         </main>

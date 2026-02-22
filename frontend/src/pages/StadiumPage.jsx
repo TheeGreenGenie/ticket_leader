@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import Header from '../components/Header';
-import Navbar from '../components/Navbar';
 import StadiumScene from '../stadium/StadiumScene';
 import { parseSeatInput } from '../stadium/stadiumMath';
 import { ENTRY_SPAWNS } from '../stadium/ParkingLots';
@@ -40,7 +39,7 @@ export default function StadiumPage() {
   const [clickedSection, setClickedSection] = useState(null); // e.g. "L5"
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) navigate('/');
+    if (!localStorage.getItem('token')) navigate('/login');
   }, [navigate]);
 
   const handleLookupReady = useCallback((lookup) => {
@@ -175,7 +174,6 @@ export default function StadiumPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: '#0d0d1a' }}>
       <Header />
-      <Navbar />
 
       {/* ── Page body — scrollable if content overflows ── */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px' }}>
@@ -388,3 +386,4 @@ export default function StadiumPage() {
     </div>
   );
 }
+

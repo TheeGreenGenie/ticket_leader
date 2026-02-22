@@ -1,0 +1,53 @@
+.home-root .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  background-color: beige;
+}
+
+.home-root .header button {
+  height: 30px;
+  cursor: pointer;
+}
+
+.home-root .menubar {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 10px 40px;
+  list-style: none;
+  background-color: azure;
+}
+
+.home-root .body {
+  min-height: 60vh;
+  background-color: aquamarine;
+}
+
+.home-root .footer {
+  background-color: yellowgreen;
+  min-height: 18vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-root .dropdown {
+  display: none;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.home-root .ticket > li:hover ~ ul.dropdown.ticket,
+.home-root .ticket > ul.dropdown:hover,
+.home-root .walkthrough > li:hover ~ ul.dropdown.walkthrough,
+.home-root .walkthrough > ul.dropdown:hover,
+.home-root .business > li:hover ~ ul.dropdown.live,
+.home-root .business > ul.dropdown:hover {
+  display: block;
+}

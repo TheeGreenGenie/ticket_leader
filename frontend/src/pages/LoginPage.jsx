@@ -34,7 +34,7 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('username', data.name || form.name);
-      navigate('/dashboard');
+      navigate('/live-queue');
     } catch (err) {
       const msg = err?.response?.data?.message || 'Server unavailable. Please try again later.';
       setError(msg);

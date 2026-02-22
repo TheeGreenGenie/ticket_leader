@@ -19,7 +19,7 @@ export default function Footer() {
           <div className="footer-links">
             <div className="footer-column">
               <h4>Platform</h4>
-              <Link to="/dashboard">Browse Events</Link>
+              <Link to="/live-queue">Browse Events</Link>
               <Link to="/my-tickets">My Tickets</Link>
               <Link to="/">How It Works</Link>
             </div>

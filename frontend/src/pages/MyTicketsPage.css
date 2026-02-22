@@ -1,0 +1,97 @@
+.mytickets-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-dark-1);
+}
+
+.mytickets-main {
+  flex: 1;
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.mytickets-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-dark-2);
+  margin-bottom: 24px;
+  min-height: 180px;
+}
+
+.mytickets-hero .hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 15% 25%, rgba(34, 211, 238, 0.18), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(59, 130, 246, 0.22), transparent 42%);
+}
+
+.mytickets-hero .hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 30px;
+}
+
+.mytickets-hero .hero-badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-accent);
+  color: var(--color-accent);
+  background: rgba(34, 211, 238, 0.1);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.mytickets-hero h1 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.mytickets-hero p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.mytickets-section {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-dark-2);
+  padding: 24px;
+}
+
+.mytickets-empty {
+  border: 1px dashed var(--border-secondary);
+  border-radius: var(--radius-lg);
+  background: var(--bg-dark-3);
+  padding: 30px;
+  text-align: center;
+}
+
+.mytickets-empty h3 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.mytickets-empty p {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+}
+
+.mytickets-empty button {
+  border: 1px solid var(--border-accent);
+  background: var(--color-accent);
+  color: #00151c;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mytickets-empty button:hover {
+  filter: brightness(1.05);
+}
