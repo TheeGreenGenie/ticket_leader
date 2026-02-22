@@ -1,0 +1,45 @@
+.walkthrough-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--gradient-dark);
+}
+
+.walkthrough-main {
+  flex: 1;
+  padding: var(--space-8);
+}
+
+.walkthrough-container {
+  max-width: var(--max-width-xl);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.walkthrough-container h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-4);
+}
+
+.walkthrough-container > p {
+  color: var(--text-muted);
+  margin-bottom: var(--space-8);
+}
+
+.walkthrough-placeholder {
+  background: var(--bg-card);
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-20);
+  color: var(--text-muted);
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+}
