@@ -6,7 +6,50 @@ import StadiumScene from '../stadium/StadiumScene';
 import { parseSeatInput } from '../stadium/stadiumMath';
 import { ENTRY_SPAWNS } from '../stadium/ParkingLots';
 import { computePathPlan } from '../stadium/pathFinder';
+import { speak, stopSpeaking } from '../services/ttsService';
 import '../styles/styles.css';
+
+const CONNECTOR_LABELS = {
+  'stair-ne': 'the northeast staircase',
+  'stair-nw': 'the northwest staircase',
+  'stair-se': 'the southeast staircase',
+  'stair-sw': 'the southwest staircase',
+  'elev-n':   'the north elevator',
+  'elev-s':   'the south elevator',
+  'elev-e':   'the east elevator',
+  'elev-w':   'the west elevator',
+};
+
+const TIER_LABELS = {
+  lower: 'lower bowl',
+  club:  'club level',
+  upper: 'upper deck',
+};
+
+function buildDirectionsText(section, row, seat, foundSeat, pathMeta, tierId) {
+  let text = `Your seat is Section ${section}`;
+  if (!foundSeat.sectionOnly) {
+    text += `, Row ${row}, Seat ${seat}`;
+  }
+  if (tierId) {
+    text += ` in the ${TIER_LABELS[tierId] || tierId}`;
+  }
+  text += '. ';
+
+  if (pathMeta?.connector) {
+    const connectorName = CONNECTOR_LABELS[pathMeta.connector.id] || pathMeta.connector.type;
+    const verb = pathMeta.connector.type === 'elevator' ? 'Take' : 'Head to';
+    text += `${verb} ${connectorName}. `;
+  }
+
+  if (pathMeta?.distanceFeet) {
+    const feet = Math.round(pathMeta.distanceFeet);
+    const mins = Math.round(pathMeta.etaMinutes);
+    text += `Your seat is approximately ${feet} feet away, about ${mins} minute${mins !== 1 ? 's' : ''} walking.`;
+  }
+
+  return text;
+}
 
 const MODES = [
   { id: 'orbit',       label: '🔭 Overview' },
@@ -38,6 +81,8 @@ export default function StadiumPage() {
 
   // Label shown when user clicks a section in the 3D view
   const [clickedSection, setClickedSection] = useState(null); // e.g. "L5"
+  const [lastDirections, setLastDirections] = useState('');
+  const lastParsedTierId = useRef(null);
 
   // Section the ball is currently inside (walkthrough mode)
   const [currentSection, setCurrentSection] = useState(null); // e.g. "L5"
@@ -120,6 +165,13 @@ export default function StadiumPage() {
     const plan = computePathPlan(ballPosRef.current, pos, parsed.tierId);
     setPathWaypoints(plan.waypoints);
     setPathMeta(plan);
+    lastParsedTierId.current = parsed.tierId;
+
+    // Speak directions via ElevenLabs
+    const seatResult = { section, row: parsed.row + 1, seat: parsed.seat + 1, sectionOnly: parsed.sectionOnly };
+    const directionsText = buildDirectionsText(section, row, seat, seatResult, plan, parsed.tierId);
+    setLastDirections(directionsText);
+    speak(directionsText);
 
     // Keep current mode so ball stays movable while path is visible
     setTargetSeat(null);
@@ -135,6 +187,8 @@ export default function StadiumPage() {
     setPathWaypoints(null);
     setPathMeta(null);
     setClickedSection(null);
+    setLastDirections('');
+    stopSpeaking();
   }, []);
 
   // Called when user clicks an entry beacon in parking mode
@@ -409,6 +463,21 @@ export default function StadiumPage() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {lastDirections && (
+                <button
+                  onClick={() => speak(lastDirections)}
+                  style={{
+                    marginTop: 10,
+                    width: '100%', padding: '7px 0',
+                    background: '#1a3a1a', color: '#88ffaa',
+                    border: '1px solid #2a6a2a', borderRadius: 5,
+                    cursor: 'pointer', fontSize: 12, fontWeight: 'bold',
+                  }}
+                >
+                  🔊 Repeat Directions
+                </button>
               )}
 
               <div style={{ marginTop: 8, fontSize: 10, color: '#666' }}>
