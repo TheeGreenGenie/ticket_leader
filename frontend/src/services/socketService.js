@@ -11,9 +11,11 @@ class SocketService {
       return;
     }
 
-    this.socket = io('http://127.0.0.1:5001', {
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || undefined;
+
+    this.socket = io(socketUrl, {
       query: { sessionId },
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
     });
 
     this.socket.on('connect', () => {
@@ -84,7 +86,7 @@ class SocketService {
   }
 
   emit(event, data) {
-    this.listeners.get(event)?.forEach(callback => {
+    this.listeners.get(event)?.forEach((callback) => {
       try {
         callback(data);
       } catch (error) {

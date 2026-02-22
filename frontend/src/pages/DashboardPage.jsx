@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { getEvents } from '../api/content';
 import './DashboardPage.css';
 
+const MAX_VISIBLE_GENRES = 6;
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef(null);
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
@@ -35,11 +39,29 @@ export default function DashboardPage() {
     navigate(`/queue/${eventId}`);
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e) => { if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const filteredEvents = filter === 'all'
     ? events
     : events.filter(e => e.artistId?.genre?.toLowerCase().includes(filter));
 
-  const genres = [...new Set(events.map(e => e.artistId?.genre?.split(',')[0]?.trim()).filter(Boolean))];
+  // Build genres sorted by event count descending
+  const genreCounts = {};
+  events.forEach(e => {
+    const g = e.artistId?.genre?.split(',')[0]?.trim();
+    if (g) genreCounts[g] = (genreCounts[g] || 0) + 1;
+  });
+  const genres = Object.entries(genreCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([g]) => g);
+
+  const topGenres  = genres.slice(0, MAX_VISIBLE_GENRES);
+  const moreGenres = genres.slice(MAX_VISIBLE_GENRES);
 
   return (
     <div className="dashboard-page">
@@ -71,15 +93,40 @@ export default function DashboardPage() {
               >
                 All
               </button>
-              {genres.map(genre => (
+              {topGenres.map(genre => (
                 <button
                   key={genre}
                   className={`filter-btn ${filter === genre.toLowerCase() ? 'active' : ''}`}
-                  onClick={() => setFilter(genre.toLowerCase())}
+                  onClick={() => { setFilter(genre.toLowerCase()); setMoreOpen(false); }}
                 >
                   {genre}
                 </button>
               ))}
+              {moreGenres.length > 0 && (
+                <div className="filter-more-wrap" ref={moreRef}>
+                  <button
+                    className={`filter-btn ${moreGenres.some(g => filter === g.toLowerCase()) ? 'active' : ''}`}
+                    onClick={() => setMoreOpen(o => !o)}
+                  >
+                    {moreGenres.some(g => filter === g.toLowerCase())
+                      ? genres.find(g => filter === g.toLowerCase()) || 'More'
+                      : `More ▾`}
+                  </button>
+                  {moreOpen && (
+                    <div className="filter-more-dropdown">
+                      {moreGenres.map(genre => (
+                        <button
+                          key={genre}
+                          className={`filter-more-item ${filter === genre.toLowerCase() ? 'active' : ''}`}
+                          onClick={() => { setFilter(genre.toLowerCase()); setMoreOpen(false); }}
+                        >
+                          {genre}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

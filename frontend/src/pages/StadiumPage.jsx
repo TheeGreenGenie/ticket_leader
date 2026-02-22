@@ -39,6 +39,9 @@ export default function StadiumPage() {
   // Label shown when user clicks a section in the 3D view
   const [clickedSection, setClickedSection] = useState(null); // e.g. "L5"
 
+  // Section the ball is currently inside (walkthrough mode)
+  const [currentSection, setCurrentSection] = useState(null); // e.g. "L5"
+
   useEffect(() => {
     if (!localStorage.getItem('token')) navigate('/login');
   }, [navigate]);
@@ -52,12 +55,17 @@ export default function StadiumPage() {
   const handleSectionClick = useCallback(({ tierId, section: sectionIdx }) => {
     const label = `${TIER_LABEL[tierId] ?? '?'}${sectionIdx + 1}`;
     setClickedSection(label);
+    setHoverTip(null);
     // Highlight the whole section (sectionOnly)
     setHighlight({ tierId, section: sectionIdx, row: 0, seat: 0, sectionOnly: true });
     setFoundSeat(null);
     setSeatError('');
     setPathWaypoints(null);
     setPathMeta(null);
+  }, []);
+
+  const handleSectionChange = useCallback((info) => {
+    setCurrentSection(info ? info.label : null);
   }, []);
 
   const handleFind = useCallback((e) => {
@@ -120,7 +128,7 @@ export default function StadiumPage() {
   const handleModeChange = useCallback((newMode) => {
     setMode(newMode);
     if (newMode !== 'orbit') setTargetSeat(null);
-    if (newMode !== 'walkthrough') setPlayerFloorY(null);
+    if (newMode !== 'walkthrough') { setPlayerFloorY(null); setCurrentSection(null); }
     setHighlight(null);
     setFoundSeat(null);
     setSeatError('');
@@ -246,6 +254,7 @@ export default function StadiumPage() {
               onSpawnAtLot={handleSpawnAtLot}
               onFloorChange={handleFloorChange}
               onSectionClick={handleSectionClick}
+              onSectionChange={handleSectionChange}
               playerFloorY={playerFloorY}
               highlight={highlight}
               pathWaypoints={pathWaypoints}
@@ -282,6 +291,11 @@ export default function StadiumPage() {
               {mode === 'walkthrough' && floorLabel && (
                 <div style={{ ...panelBase, fontSize: 12, color: '#aac8ff', textAlign: 'center', pointerEvents: 'none' }}>
                   📍 {floorLabel}
+                </div>
+              )}
+              {mode === 'walkthrough' && currentSection && (
+                <div style={{ ...panelBase, fontSize: 12, textAlign: 'center', pointerEvents: 'none', border: '1px solid #ffaa00', color: 'white' }}>
+                  🪑 Section <strong style={{ fontSize: 15 }}>{currentSection}</strong>
                 </div>
               )}
             </div>

@@ -9,21 +9,29 @@ const authRoutes = require('./routes/auth');
 const queueRoutes = require('./routes/queue');
 const contentRoutes = require('./routes/content');
 const gamesRoutes = require('./routes/games');
+const syncRoutes = require('./routes/sync');
 
 const { initializeQueueSocket, startPeriodicUpdates } = require('./sockets/queueSocket');
 
 const app = express();
 const server = http.createServer(app);
+
+const DEFAULT_ORIGINS = ['http://127.0.0.1:4001'];
+const corsOrigins = (process.env.CORS_ORIGINS || DEFAULT_ORIGINS.join(','))
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: ['http://127.0.0.1:4001'],
-    credentials: true
-  }
+    origin: corsOrigins,
+    credentials: true,
+  },
 });
 
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({ origin: ['http://127.0.0.1:4001'], credentials: true }));
+app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 
 // API Routes
@@ -31,6 +39,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/games', gamesRoutes);
+app.use('/api/sync', syncRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));

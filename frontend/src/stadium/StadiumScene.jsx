@@ -70,6 +70,7 @@ function OrbitKeyboard({
   return null;
 }
 
+import { sectionFromBallPos }  from './stadiumMath';
 import { CollisionProvider }   from './CollisionContext';
 import { StadiumLighting }     from './StadiumLighting';
 import { FootballField }       from './FootballField';
@@ -100,6 +101,21 @@ function FloorPoller({ floorYRef, onFloorChange }) {
   return null;
 }
 
+// Polls ballPosRef every frame and fires onSectionChange when the section changes.
+function SectionPoller({ active, ballPosRef, onSectionChange }) {
+  const last = useRef(null);
+  useFrame(() => {
+    if (!active || !ballPosRef?.current || !onSectionChange) return;
+    const info = sectionFromBallPos(ballPosRef.current);
+    const key = info ? `${info.tierId}-${info.section}` : null;
+    if (key !== last.current) {
+      last.current = key;
+      onSectionChange(info);
+    }
+  });
+  return null;
+}
+
 // Keep OrbitControls pivot locked to the moving ball in parking mode.
 function ParkingBallTarget({ active, controlsRef, ballPosRef }) {
   useFrame(() => {
@@ -122,6 +138,7 @@ export default function StadiumScene({
   onSpawnAtLot,
   onFloorChange,
   onSectionClick,
+  onSectionChange,
   playerFloorY,
   highlight,
   pathWaypoints,
@@ -186,6 +203,9 @@ export default function StadiumScene({
 
           {/* Poll floorYRef and bubble up to parent for seat transparency */}
           <FloorPoller floorYRef={floorYRef} onFloorChange={onFloorChange} />
+
+          {/* Poll ball position and bubble up current section to parent */}
+          <SectionPoller active={isWalk} ballPosRef={ballPosRef} onSectionChange={onSectionChange} />
 
           {isOrbit && (
             <>

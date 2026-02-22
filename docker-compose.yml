@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: ticketleader-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ticketleader-server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      PORT: 5001
+      MONGO_URI: mongodb://mongo:27017/ticketleader
+      CORS_ORIGINS: http://127.0.0.1:4001
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "5001:5001"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ticketleader-frontend
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "4001:80"
+
+volumes:
+  mongo_data:

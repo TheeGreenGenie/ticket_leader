@@ -130,6 +130,52 @@ export function buildSeatLookup(allTierData) {
   return map;
 }
 
+// ── Determine which section the ball is currently inside ──────────────────
+// Returns { tierId, section, label } or null if not inside any seating tier.
+//
+// The ball walks on the concourse ring which sits just outside the seat blocks,
+// so we match by Y floor level rather than tight radial bounds.
+// Each tier owns a distinct Y range so there is no overlap risk.
+//
+// Concourse walk radii (from pathFinder) vs seat inner radii:
+//   lower  floor y≈18  concourse r≈95   seats inner r≈54
+//   club   floor y≈21  concourse r≈108  seats inner r≈88
+//   upper  floor y≈33  concourse r≈115  seats inner r≈99
+//
+// We use innerA/B as the minimum radius so the field itself never triggers,
+// and set a generous outer cap well beyond the concourse ring.
+export function sectionFromBallPos(pos) {
+  if (!pos) return null;
+  const { x, y, z } = pos;
+  const r = Math.sqrt(x * x + z * z);
+
+  // Y bands that encompass each tier's seating + its concourse walkway.
+  // Lower:  y  0 – 22   Club: y 18 – 28   Upper: y 29 – 62
+  // Ordered most-specific first so overlap edges resolve correctly.
+  const Y_BANDS = [
+    { cfg: TIER_CONFIGS[1], yMin: 18, yMax: 28 },  // club
+    { cfg: TIER_CONFIGS[2], yMin: 29, yMax: 62 },  // upper
+    { cfg: TIER_CONFIGS[0], yMin:  0, yMax: 22 },  // lower (widest, last)
+  ];
+
+  for (const { cfg, yMin, yMax } of Y_BANDS) {
+    if (y < yMin || y > yMax) continue;
+
+    // Exclude field center — anything inside half the inner seat ellipse is not a section.
+    const minR = (cfg.innerA + cfg.innerB) / 4;
+    if (r < minR) continue;
+
+    // Compute section index from horizontal angle only.
+    const angle = Math.atan2(z, x); // [-π, π]
+    const norm = angle < 0 ? angle + 2 * Math.PI : angle; // [0, 2π)
+    const angStep = (2 * Math.PI) / cfg.sectionCount;
+    const section = Math.floor(norm / angStep) % cfg.sectionCount;
+
+    return { tierId: cfg.id, section, label: `${cfg.label}${section + 1}` };
+  }
+  return null;
+}
+
 // ── Parse user input → { tierId, section, row, seat, sectionOnly }
 // Row and seat are optional — if omitted, defaults to middle of section.
 export function parseSeatInput(sectionLabel, rowInput, seatInput) {
