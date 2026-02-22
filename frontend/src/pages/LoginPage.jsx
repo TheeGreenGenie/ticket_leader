@@ -32,8 +32,8 @@ export default function LoginPage() {
         data = await signup(form.name, form.email, form.password);
       }
       localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId);
-      localStorage.setItem('username', data.name || form.name);
+      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem('username', data.user.name || form.name);
       navigate('/dashboard');
     } catch (err) {
       const msg = err?.response?.data?.message || 'Server unavailable. Please try again later.';

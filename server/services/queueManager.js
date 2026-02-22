@@ -21,8 +21,8 @@ class QueueManager {
       throw new Error('Queue is at capacity');
     }
 
-    // Check if user already in queue for this event
-    if (userId) {
+    // Check if user already in queue for this event (only if valid userId)
+    if (userId && userId !== 'null' && userId !== 'undefined') {
       const existing = await QueueSession.findOne({
         userId,
         eventId,
@@ -43,16 +43,21 @@ class QueueManager {
     // Get current queue size for this event
     const currentPosition = event.currentQueueSize + 1;
 
-    // Create queue session
-    const session = new QueueSession({
-      userId,
+    // Create queue session (only include userId if valid)
+    const sessionData = {
       sessionId,
       eventId,
       currentPosition,
       trustScore: 50,
       trustLevel: 'silver',
       status: 'waiting'
-    });
+    };
+
+    if (userId && userId !== 'null' && userId !== 'undefined') {
+      sessionData.userId = userId;
+    }
+
+    const session = new QueueSession(sessionData);
 
     await session.save();
 
