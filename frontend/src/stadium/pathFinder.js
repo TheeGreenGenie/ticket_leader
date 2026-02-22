@@ -1,28 +1,34 @@
-// pathFinder.js — computes waypoint path from ball position to a seat
-// Used by SeatPath to draw an animated route preview.
+// pathFinder.js - computes waypoint paths from ball position to a seat.
+// Route policy:
+// 1) Stay on walkable concourse rings.
+// 2) Use the nearest viable connector (stairs/elevator) for floor changes.
+// 3) Never route through field center by using ring arcs for horizontal travel.
 
-const PATH_ELEV = 1.8; // lift every waypoint above ground/floor so tube never clips
+const PATH_ELEV = 1.8;
+const WALK_SPEED_MPS = 1.4; // ~5.0 km/h
 
-const TOWERS = [
-  { id: 'ne', cx:  80, cz: -55 },
-  { id: 'nw', cx: -80, cz: -55 },
-  { id: 'se', cx:  80, cz:  55 },
-  { id: 'sw', cx: -80, cz:  55 },
-];
-
-const LEVELS = [0, 18, 21, 33]; // valid concourse floor Y values
-
+const LEVELS = [0, 18, 21, 33];
 const TIER_FLOOR_Y = { lower: 18, club: 21, upper: 33 };
 
-// Walk radius (midpoint of navigable concourse ring) at each floor level
+// Walk radius (navigable concourse ring) at each floor level.
 const CONCOURSE_WALK_RADIUS = {
-  0:  { a: 90,  b: 68  },
-  18: { a: 108, b: 82  },
-  21: { a: 123, b: 94  },
+  0: { a: 90, b: 68 },
+  18: { a: 108, b: 82 },
+  21: { a: 123, b: 94 },
   33: { a: 130, b: 100 },
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// Mixed set of vertical connectors.
+const CONNECTORS = [
+  { id: 'stair-ne', type: 'stair', x: 80, z: -55, exitOffsetZ: 7 },
+  { id: 'stair-nw', type: 'stair', x: -80, z: -55, exitOffsetZ: 7 },
+  { id: 'stair-se', type: 'stair', x: 80, z: 55, exitOffsetZ: 7 },
+  { id: 'stair-sw', type: 'stair', x: -80, z: 55, exitOffsetZ: 7 },
+  { id: 'elev-n', type: 'elevator', x: 0, z: -88, exitOffsetZ: 5 },
+  { id: 'elev-s', type: 'elevator', x: 0, z: 88, exitOffsetZ: -5 },
+  { id: 'elev-e', type: 'elevator', x: 102, z: 0, exitOffsetZ: 0 },
+  { id: 'elev-w', type: 'elevator', x: -102, z: 0, exitOffsetZ: 0 },
+];
 
 function nearestLevel(y) {
   return LEVELS.reduce((best, lvl) =>
@@ -38,15 +44,41 @@ function ellipsePoint(a, b, theta, y) {
   return { x: a * Math.cos(theta), y: y + PATH_ELEV, z: b * Math.sin(theta) };
 }
 
-// Walk along the concourse ring (shortest arc) from fromAngle to toAngle
-function concourseArcWaypoints(fromAngle, toAngle, floorY, nPoints = 14) {
+function connectorEntryPoint(connector, floorY) {
+  const z = connector.z + (connector.exitOffsetZ ?? 0);
+  return { x: connector.x, y: floorY + PATH_ELEV, z };
+}
+
+function distXZ(a, b) {
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  return Math.sqrt(dx * dx + dz * dz);
+}
+
+function normAngleDelta(fromAngle, toAngle) {
+  let delta = toAngle - fromAngle;
+  while (delta > Math.PI) delta -= 2 * Math.PI;
+  while (delta < -Math.PI) delta += 2 * Math.PI;
+  return delta;
+}
+
+function arcDistance(fromAngle, toAngle, floorY) {
+  const ring = CONCOURSE_WALK_RADIUS[floorY] ?? CONCOURSE_WALK_RADIUS[18];
+  const avgR = (ring.a + ring.b) / 2;
+  return Math.abs(normAngleDelta(fromAngle, toAngle)) * avgR;
+}
+
+function radialDistanceToRing(pos, floorY) {
+  const ring = CONCOURSE_WALK_RADIUS[floorY] ?? CONCOURSE_WALK_RADIUS[18];
+  const r = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
+  const avgR = (ring.a + ring.b) / 2;
+  return Math.abs(avgR - r);
+}
+
+function concourseArcWaypoints(fromAngle, toAngle, floorY, nPoints = 16) {
   const ring = CONCOURSE_WALK_RADIUS[floorY] ?? CONCOURSE_WALK_RADIUS[18];
   const { a, b } = ring;
-
-  let delta = toAngle - fromAngle;
-  while (delta >  Math.PI) delta -= 2 * Math.PI;
-  while (delta < -Math.PI) delta += 2 * Math.PI;
-
+  const delta = normAngleDelta(fromAngle, toAngle);
   const pts = [];
   for (let i = 0; i <= nPoints; i++) {
     const theta = fromAngle + (i / nPoints) * delta;
@@ -55,101 +87,132 @@ function concourseArcWaypoints(fromAngle, toAngle, floorY, nPoints = 14) {
   return pts;
 }
 
-// Front-face opening of a tower at a given Y level
-function towerEntryPoint(tower, y) {
-  return { x: tower.cx, y: y + PATH_ELEV, z: tower.cz + 7 };
+function waypointLengthMeters(waypoints) {
+  if (!waypoints || waypoints.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < waypoints.length; i++) {
+    const a = waypoints[i - 1];
+    const b = waypoints[i];
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const dz = b.z - a.z;
+    total += Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+  return total;
 }
 
-// Straight distance between two points (XZ only, ignoring Y)
-function distXZ(a, b) {
-  const dx = b.x - a.x;
-  const dz = b.z - a.z;
-  return Math.sqrt(dx * dx + dz * dz);
+function pickBestConnector(ballPos, ballFloorY, seatFloorY, seatAngle) {
+  let best = null;
+  let bestCost = Infinity;
+  const ballAngle = pointAngle(ballPos.x, ballPos.z);
+
+  for (const connector of CONNECTORS) {
+    const entryStart = connectorEntryPoint(connector, ballFloorY);
+    const entryDest = connectorEntryPoint(connector, seatFloorY);
+    const connectorStartAngle = pointAngle(entryStart.x, entryStart.z);
+
+    // Horizontal travel policy: move to ring, arc around ring, then connector.
+    const approachToRing = radialDistanceToRing(ballPos, ballFloorY);
+    const startArcDist = arcDistance(ballAngle, connectorStartAngle, ballFloorY);
+    const connectorAngle = pointAngle(entryDest.x, entryDest.z);
+    const endArcDist = arcDistance(connectorAngle, seatAngle, seatFloorY);
+    const vertical = Math.abs(seatFloorY - ballFloorY);
+
+    const cost = approachToRing + startArcDist + endArcDist + vertical;
+    if (cost < bestCost) {
+      bestCost = cost;
+      best = connector;
+    }
+  }
+
+  return best;
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
-
-/**
- * computeWaypoints
- * @param {{ x: number, y: number, z: number }} ballPos — ball world position
- * @param {{ x: number, y: number, z: number }} seatPos — seat world position
- * @param {'lower'|'club'|'upper'} tierId
- * @returns {{ x: number, y: number, z: number }[]} ordered waypoints
- */
-export function computeWaypoints(ballPos, seatPos, tierId) {
-  if (!ballPos || !seatPos || !tierId) return [];
+export function computePathPlan(ballPos, seatPos, tierId) {
+  if (!ballPos || !seatPos || !tierId) {
+    return {
+      waypoints: [],
+      connector: null,
+      distanceMeters: 0,
+      distanceFeet: 0,
+      etaMinutes: 0,
+    };
+  }
 
   const waypoints = [];
-
-  // 1. Start at ball (elevate so path floats above ground)
   waypoints.push({ x: ballPos.x, y: ballPos.y + PATH_ELEV, z: ballPos.z });
 
   const ballFloorY = nearestLevel(ballPos.y);
   const seatFloorY = TIER_FLOOR_Y[tierId] ?? 18;
-  const seatAngle  = pointAngle(seatPos.x, seatPos.z);
+  const seatAngle = pointAngle(seatPos.x, seatPos.z);
+  const ballAngle = pointAngle(ballPos.x, ballPos.z);
 
-  // 2. Same floor — skip tower, just arc along concourse then walk to seat
-  if (ballFloorY === seatFloorY) {
-    const ballAngle = pointAngle(ballPos.x, ballPos.z);
-    // Walk out to concourse ring radius first
-    const ring = CONCOURSE_WALK_RADIUS[seatFloorY];
-    const ballOnRing = ellipsePoint(ring.a, ring.b, ballAngle, seatFloorY);
-    waypoints.push(ballOnRing);
-
-    const arcPts = concourseArcWaypoints(ballAngle, seatAngle, seatFloorY, 14);
-    waypoints.push(...arcPts.slice(1)); // skip duplicate
-    waypoints.push({ x: seatPos.x, y: seatPos.y + PATH_ELEV, z: seatPos.z });
-    return waypoints;
+  const connector = pickBestConnector(ballPos, ballFloorY, seatFloorY, seatAngle);
+  if (!connector) {
+    const fallback = [
+      { x: ballPos.x, y: ballPos.y + PATH_ELEV, z: ballPos.z },
+      { x: seatPos.x, y: seatPos.y + PATH_ELEV, z: seatPos.z },
+    ];
+    const d = waypointLengthMeters(fallback);
+    return {
+      waypoints: fallback,
+      connector: null,
+      distanceMeters: d,
+      distanceFeet: d * 3.28084,
+      etaMinutes: d / WALK_SPEED_MPS / 60,
+    };
   }
 
-  // 3. Different floor — find nearest staircase tower
-  let bestTower = null;
-  let bestCost  = Infinity;
+  // Move from current location to concourse ring first.
+  const ring = CONCOURSE_WALK_RADIUS[ballFloorY] ?? CONCOURSE_WALK_RADIUS[18];
+  const ballOnRing = ellipsePoint(ring.a, ring.b, ballAngle, ballFloorY);
+  waypoints.push(ballOnRing);
 
-  for (const tower of TOWERS) {
-    const entry = towerEntryPoint(tower, ballFloorY);
-    const distToTower = distXZ({ x: ballPos.x, z: ballPos.z }, { x: entry.x, z: entry.z });
+  // Follow the ring to the selected connector on current floor.
+  const startEntry = connectorEntryPoint(connector, ballFloorY);
+  const startEntryAngle = pointAngle(startEntry.x, startEntry.z);
+  const approachArc = concourseArcWaypoints(ballAngle, startEntryAngle, ballFloorY, 14);
+  waypoints.push(...approachArc.slice(1));
+  waypoints.push(startEntry);
 
-    const exit       = towerEntryPoint(tower, seatFloorY);
-    const towerAngle = pointAngle(exit.x, exit.z);
-    const ring       = CONCOURSE_WALK_RADIUS[seatFloorY];
-    const avgR       = (ring.a + ring.b) / 2;
+  // Vertical transition through connector if needed.
+  if (ballFloorY !== seatFloorY) {
+    const fromIdx = LEVELS.indexOf(ballFloorY);
+    const toIdx = LEVELS.indexOf(seatFloorY);
+    const step = toIdx > fromIdx ? 1 : -1;
 
-    let arcDelta = Math.abs(seatAngle - towerAngle);
-    if (arcDelta > Math.PI) arcDelta = 2 * Math.PI - arcDelta;
-    const arcDist = arcDelta * avgR;
-
-    const cost = distToTower + arcDist;
-    if (cost < bestCost) {
-      bestCost  = cost;
-      bestTower = tower;
+    for (let idx = fromIdx + step; idx !== toIdx + step; idx += step) {
+      waypoints.push({
+        x: connector.x,
+        y: LEVELS[idx] + PATH_ELEV,
+        z: connector.z,
+      });
     }
   }
 
-  // 4. Ball → tower entry at ball's floor
-  const towerEntry = towerEntryPoint(bestTower, ballFloorY);
-  waypoints.push(towerEntry);
+  // Exit connector and travel around the concourse ring to seat angle.
+  const exit = connectorEntryPoint(connector, seatFloorY);
+  const exitAngle = pointAngle(exit.x, exit.z);
+  waypoints.push(exit);
 
-  // 5. Walk up/down through intermediate landings inside the tower
-  const fromIdx = LEVELS.indexOf(ballFloorY);
-  const toIdx   = LEVELS.indexOf(seatFloorY);
-  const step    = toIdx > fromIdx ? 1 : -1;
-
-  for (let idx = fromIdx + step; idx !== toIdx + step; idx += step) {
-    waypoints.push({ x: bestTower.cx, y: LEVELS[idx] + PATH_ELEV, z: bestTower.cz });
-  }
-
-  // 6. Tower exit at seat's floor
-  const towerExit = towerEntryPoint(bestTower, seatFloorY);
-  waypoints.push(towerExit);
-
-  // 7. Walk arc along concourse ring to seat's angle
-  const towerAngle = pointAngle(towerExit.x, towerExit.z);
-  const arcPts     = concourseArcWaypoints(towerAngle, seatAngle, seatFloorY, 14);
+  const arcPts = concourseArcWaypoints(exitAngle, seatAngle, seatFloorY, 16);
   waypoints.push(...arcPts.slice(1));
 
-  // 8. End at seat
+  // Final approach to seat.
   waypoints.push({ x: seatPos.x, y: seatPos.y + PATH_ELEV, z: seatPos.z });
 
-  return waypoints;
+  const distanceMeters = waypointLengthMeters(waypoints);
+
+  return {
+    waypoints,
+    connector,
+    distanceMeters,
+    distanceFeet: distanceMeters * 3.28084,
+    etaMinutes: distanceMeters / WALK_SPEED_MPS / 60,
+  };
+}
+
+// Backward-compatible helper used by existing renderer.
+export function computeWaypoints(ballPos, seatPos, tierId) {
+  return computePathPlan(ballPos, seatPos, tierId).waypoints;
 }

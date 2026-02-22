@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import StadiumScene from '../stadium/StadiumScene';
 import { parseSeatInput } from '../stadium/stadiumMath';
 import { ENTRY_SPAWNS } from '../stadium/ParkingLots';
-import { computeWaypoints } from '../stadium/pathFinder';
+import { computePathPlan } from '../stadium/pathFinder';
 import '../styles/styles.css';
 
 const MODES = [
@@ -23,6 +23,7 @@ export default function StadiumPage() {
   const [playerFloorY, setPlayerFloorY] = useState(null);
   const [highlight, setHighlight]   = useState(null); // { tierId, section, row, seat, sectionOnly }
   const [pathWaypoints, setPathWaypoints] = useState(null);
+  const [pathMeta, setPathMeta] = useState(null);
 
   const seatLookupRef = useRef(null);
   // Tracks ball world position every frame (written by WalkthroughControls)
@@ -56,15 +57,18 @@ export default function StadiumPage() {
     setFoundSeat(null);
     setSeatError('');
     setPathWaypoints(null);
+    setPathMeta(null);
   }, []);
 
   const handleFind = useCallback((e) => {
     e.preventDefault();
     const parsed = parseSeatInput(section, row, seat);
     if (!parsed) {
-      setSeatError('Invalid section. Use: L1–L54, C1–C22, or U1–U36');
+      setSeatError('Invalid section. Use: L1-L54, C1-C22, or U1-U36');
       setFoundSeat(null);
       setHighlight(null);
+      setPathWaypoints(null);
+      setPathMeta(null);
       return;
     }
     const lookup = seatLookupRef.current;
@@ -85,9 +89,11 @@ export default function StadiumPage() {
     }
 
     if (!pos) {
-      setSeatError('Section not found. Use: L1–L54, C1–C22, or U1–U36');
+      setSeatError('Section not found. Use: L1-L54, C1-C22, or U1-U36');
       setFoundSeat(null);
       setHighlight(null);
+      setPathWaypoints(null);
+      setPathMeta(null);
       return;
     }
     setSeatError('');
@@ -102,9 +108,10 @@ export default function StadiumPage() {
       sectionOnly: parsed.sectionOnly,
     });
 
-    // Compute path from ball's current position to seat
-    const waypoints = computeWaypoints(ballPosRef.current, pos, parsed.tierId);
-    setPathWaypoints(waypoints);
+    // Compute route plan from ball's current position to seat.
+    const plan = computePathPlan(ballPosRef.current, pos, parsed.tierId);
+    setPathWaypoints(plan.waypoints);
+    setPathMeta(plan);
 
     // Keep current mode so ball stays movable while path is visible
     setTargetSeat(null);
@@ -118,6 +125,7 @@ export default function StadiumPage() {
     setFoundSeat(null);
     setSeatError('');
     setPathWaypoints(null);
+    setPathMeta(null);
     setClickedSection(null);
   }, []);
 
@@ -327,7 +335,7 @@ export default function StadiumPage() {
                   style={inputStyle}
                   placeholder="e.g. L5, C3, U12"
                   value={section}
-                  onChange={e => { setSection(e.target.value); setHighlight(null); setFoundSeat(null); setPathWaypoints(null); }}
+                  onChange={e => { setSection(e.target.value); setHighlight(null); setFoundSeat(null); setPathWaypoints(null); setPathMeta(null); }}
                 />
                 <label style={{ fontSize: 11, color: '#aaa' }}>Row <span style={{ color: '#555' }}>(optional)</span></label>
                 <input
@@ -372,6 +380,19 @@ export default function StadiumPage() {
                   <div>Section <strong>{foundSeat.section}</strong></div>
                   {!foundSeat.sectionOnly && (
                     <div>Row <strong>{foundSeat.row}</strong> · Seat <strong>{foundSeat.seat}</strong></div>
+                  )}
+                  {pathMeta && pathMeta.distanceMeters > 0 && (
+                    <div style={{ marginTop: 6, color: '#cde7ff' }}>
+                      Walk: <strong>{pathMeta.distanceMeters.toFixed(1)} m</strong> ({pathMeta.distanceFeet.toFixed(0)} ft)
+                      <br />
+                      Est. time: <strong>{pathMeta.etaMinutes.toFixed(1)} min</strong>
+                      {pathMeta.connector && (
+                        <>
+                          <br />
+                          Route via nearest <strong>{pathMeta.connector.type}</strong> ({pathMeta.connector.id})
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
