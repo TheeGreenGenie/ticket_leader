@@ -34,11 +34,8 @@ export default function VerifyPage() {
     setStatus('pending');
     try {
       const userId = localStorage.getItem('userId') || 'guest';
-
-      // WebAuthn requires a valid domain as rpId — IP addresses (127.0.0.1) are rejected.
-      // We use 'localhost' explicitly so this works in local development.
-      // On a real deployed domain this would be replaced with the actual domain.
-      const rpId = window.location.hostname === '127.0.0.1' ? 'localhost' : window.location.hostname;
+      // Use the current host for RP ID.
+      const rpId = window.location.hostname;
 
       await navigator.credentials.create({
         publicKey: {
@@ -137,3 +134,5 @@ export default function VerifyPage() {
     </div>
   );
 }
+
+

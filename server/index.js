@@ -16,14 +16,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:4001', 'http://127.0.0.1:4001'],
+    origin: ['http://127.0.0.1:4001'],
     credentials: true
   }
 });
 
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({ origin: ['http://localhost:4001', 'http://127.0.0.1:4001'], credentials: true }));
+app.use(cors({ origin: ['http://127.0.0.1:4001'], credentials: true }));
 app.use(express.json());
 
 // API Routes

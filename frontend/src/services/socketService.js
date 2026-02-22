@@ -11,7 +11,7 @@ class SocketService {
       return;
     }
 
-    this.socket = io('http://localhost:5001', {
+    this.socket = io('http://127.0.0.1:5001', {
       query: { sessionId },
       transports: ['websocket', 'polling']
     });

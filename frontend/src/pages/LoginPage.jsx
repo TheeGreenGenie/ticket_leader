@@ -4,7 +4,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { login, signup } from '../api/auth';
 import './LoginPage.css';
 
-const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
+const CAPTCHA_ENABLED = Boolean(SITE_KEY) && SITE_KEY !== '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -22,15 +23,15 @@ export default function LoginPage() {
     setMode(newMode);
     setError('');
     setForm({ name: '', email: '', password: '' });
-    recaptchaRef.current?.reset();
+    if (CAPTCHA_ENABLED) recaptchaRef.current?.reset();
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
 
-    const captchaToken = recaptchaRef.current?.getValue();
-    if (!captchaToken) {
+    const captchaToken = CAPTCHA_ENABLED ? recaptchaRef.current?.getValue() : null;
+    if (CAPTCHA_ENABLED && !captchaToken) {
       setError('Please complete the CAPTCHA.');
       return;
     }
@@ -50,7 +51,7 @@ export default function LoginPage() {
     } catch (err) {
       const msg = err?.response?.data?.message || 'Server unavailable. Please try again later.';
       setError(msg);
-      recaptchaRef.current?.reset();
+      if (CAPTCHA_ENABLED) recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -177,9 +178,11 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <div style={{ marginBottom: 12 }}>
-                  <ReCAPTCHA ref={recaptchaRef} sitekey={SITE_KEY} />
-                </div>
+                {CAPTCHA_ENABLED && (
+                  <div style={{ marginBottom: 12 }}>
+                    <ReCAPTCHA ref={recaptchaRef} sitekey={SITE_KEY} />
+                  </div>
+                )}
 
                 {error && (
                   <div className="form-error">
