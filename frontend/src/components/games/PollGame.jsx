@@ -65,6 +65,14 @@ export default function PollGame({ polls, sessionId, onComplete, onTrustUpdate }
     }
   };
 
+  if (!polls || polls.length === 0) {
+    return (
+      <div className="poll-loading">
+        <p>No polls available for this artist right now.</p>
+      </div>
+    );
+  }
+
   if (!currentPoll) {
     return <div className="poll-loading">Loading polls...</div>;
   }

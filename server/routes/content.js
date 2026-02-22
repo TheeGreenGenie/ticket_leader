@@ -51,41 +51,78 @@ router.get('/artists/:artistId', async (req, res) => {
  *   - difficulty: easy|medium|hard|mixed (default mixed for AI)
  *   - useAI: true|false (default true if Gemini available)
  */
+const TRIVIA_POOL_SIZE = 15;
+
+/**
+ * Ensure the DB has at least TRIVIA_POOL_SIZE questions for an artist.
+ * Calls Gemini only when the pool is thin. Safe to call fire-and-forget.
+ */
+async function ensureTriviaPool(artistId) {
+  if (!geminiService.isAvailable()) return;
+  try {
+    const existingCount = await TriviaQuestion.countDocuments({ artistId });
+    if (existingCount >= TRIVIA_POOL_SIZE) return; // pool is healthy
+
+    const artist = await Artist.findById(artistId);
+    if (!artist) return;
+
+    const needed = TRIVIA_POOL_SIZE - existingCount;
+    const aiQuestions = await geminiService.generateTrivia(artist.name, needed, 'mixed');
+
+    // Dedup by question text before inserting
+    const existingTexts = new Set(
+      (await TriviaQuestion.find({ artistId }, 'question')).map(q => q.question)
+    );
+    const newDocs = aiQuestions
+      .filter(q => !existingTexts.has(q.question))
+      .map(q => ({
+        artistId,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        difficulty: q.difficulty || 'medium',
+        category: q.category || 'general',
+        trustBoost: q.trustBoost || 5,
+      }));
+    if (newDocs.length > 0) {
+      await TriviaQuestion.insertMany(newDocs);
+      console.log(`Seeded ${newDocs.length} trivia questions for artist ${artistId}`);
+    }
+  } catch (err) {
+    console.warn('ensureTriviaPool failed:', err.message);
+  }
+}
+
 router.get('/artists/:artistId/trivia', async (req, res) => {
   try {
     const { artistId } = req.params;
-    const { limit = 5, difficulty, useAI = 'true' } = req.query;
+    const { limit = 5, difficulty, useAI = 'true', exclude = '' } = req.query;
+    const requestedLimit = parseInt(limit);
 
-    // Try AI generation if requested and available
-    if (useAI === 'true' && geminiService.isAvailable()) {
-      const artist = await Artist.findById(artistId);
-      if (artist) {
-        try {
-          const aiQuestions = await geminiService.generateTrivia(
-            artist.name,
-            parseInt(limit),
-            difficulty || 'mixed'
-          );
-          return res.json(aiQuestions.map(q => ({ ...q, artistId })));
-        } catch (aiError) {
-          console.warn('AI generation failed, falling back to static:', aiError.message);
-        }
-      }
+    if (useAI === 'true') {
+      await ensureTriviaPool(artistId);
+    } else {
+      ensureTriviaPool(artistId).catch(() => {});
     }
 
-    // Fallback to static questions from database
     const query = { artistId };
     if (difficulty && difficulty !== 'mixed') {
       query.difficulty = difficulty;
     }
 
-    const questions = await TriviaQuestion.find(query);
+    // Parse excluded IDs sent by the client (recently seen questions)
+    const excludeIds = exclude
+      ? exclude.split(',').filter(id => id.match(/^[a-f\d]{24}$/i))
+      : [];
 
-    // Randomize questions
-    const shuffled = questions.sort(() => Math.random() - 0.5);
-    const limited = shuffled.slice(0, parseInt(limit));
+    let questions = await TriviaQuestion.find(query);
 
-    res.json(limited);
+    // Prefer unseen questions; fall back to full pool if not enough remain
+    const unseen = questions.filter(q => !excludeIds.includes(q._id.toString()));
+    const pool = unseen.length >= requestedLimit ? unseen : questions;
+
+    const shuffled = pool.sort(() => Math.random() - 0.5);
+    res.json(shuffled.slice(0, requestedLimit));
   } catch (error) {
     console.error('Get trivia error:', error);
     res.status(500).json({ error: 'Failed to fetch trivia questions' });

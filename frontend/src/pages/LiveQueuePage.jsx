@@ -45,10 +45,24 @@ export default function LiveQueuePage() {
   const [triviaQuestions, setTriviaQuestions] = useState([]);
   const [pollQuestions, setPollQuestions] = useState([]);
   const [gamesLoading, setGamesLoading] = useState(false);
+  // Track seen question IDs so the server can exclude them next round
+  const seenTriviaIds = useRef([]);
 
   // UI state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Reset game content whenever the event changes so we re-fetch for the new artist
+  useEffect(() => {
+    setTriviaQuestions([]);
+    setPollQuestions([]);
+    setActiveGame(null);
+    setGatePhase('loading');
+    setGateQuestion(null);
+    setGateError('');
+    setTriviaWrongAttempts(0);
+    setFastWrongAttempts(0);
+  }, [eventId]);
 
   // Initialize: load event, check for existing session or show trivia gate
   useEffect(() => {
@@ -91,13 +105,17 @@ export default function LiveQueuePage() {
         }
 
         // No existing session — fetch a gate trivia question
-        const questions = await getTrivia(aid, { limit: 1, useAI: false });
+        // Try static DB questions first, then fall back to Gemini AI generation
+        let questions = await getTrivia(aid, { limit: 1, useAI: false });
+        if (!questions || questions.length === 0) {
+          questions = await getTrivia(aid, { limit: 1, useAI: true });
+        }
         if (questions && questions.length > 0) {
           setGateQuestion(questions[0]);
           gateQuestionShownAt.current = Date.now();
           setGatePhase('trivia');
         } else {
-          // No trivia available — skip gate and join directly
+          // No trivia available at all — skip gate and join directly
           await joinNewQueue(null, null, 0, 0);
         }
       } catch (err) {
@@ -170,7 +188,10 @@ export default function LiveQueuePage() {
 
         setGateError(msg + ' Try this new question.');
         try {
-          const fresh = await getTrivia(artistId, { limit: 1, useAI: false });
+          let fresh = await getTrivia(artistId, { limit: 1, useAI: false });
+          if (!fresh || fresh.length === 0) {
+            fresh = await getTrivia(artistId, { limit: 1, useAI: true });
+          }
           if (fresh && fresh.length > 0) {
             setGateQuestion(fresh[0]);
             gateQuestionShownAt.current = Date.now();
@@ -257,25 +278,30 @@ export default function LiveQueuePage() {
           try {
             const localTrivia = await getLocalTrivia(artistId, locationData.city, 2);
             trivia = [...localTrivia];
-            console.log(`Loaded ${localTrivia.length} local trivia questions for ${locationData.city}`);
           } catch (err) {
             console.warn('Local trivia not available:', err);
           }
         }
 
-        // Fill remaining with regular trivia
+        // Fill remaining slots with regular trivia, excluding recently seen questions
         const regularCount = 5 - trivia.length;
         if (regularCount > 0) {
-          const regularTrivia = await getTrivia(artistId, { limit: regularCount, useAI: true });
+          const regularTrivia = await getTrivia(artistId, {
+            limit: regularCount,
+            useAI: true,
+            exclude: seenTriviaIds.current.join(','),
+          });
           trivia = [...trivia, ...regularTrivia];
         }
 
-        // Shuffle to mix local and regular
         trivia.sort(() => Math.random() - 0.5);
         setTriviaQuestions(trivia);
-      } else if (gameType === 'poll' && pollQuestions.length === 0) {
-        const polls = await getPolls(artistId, 3);
-        setPollQuestions(polls);
+      } else if (gameType === 'poll') {
+        // Only fetch polls once per session — they don't change
+        if (pollQuestions.length === 0) {
+          const polls = await getPolls(artistId, 3);
+          setPollQuestions(polls);
+        }
       }
     } catch (err) {
       console.error(`Failed to load ${gameType}:`, err);
@@ -285,12 +311,21 @@ export default function LiveQueuePage() {
   }, [artistId, pollQuestions.length, locationData]);
 
   const startGame = async (gameType) => {
-    await loadGameContent(gameType);
+    // Set both activeGame and gamesLoading synchronously so the spinner renders
+    // before the async fetch begins — prevents TriviaGame mounting with empty array
     setActiveGame(gameType);
+    setGamesLoading(true);
+    await loadGameContent(gameType);
   };
 
   const handleGameComplete = (result) => {
     console.log('Game completed:', result);
+    // Record seen IDs so next round excludes them; reset after a full cycle
+    const newSeen = [...seenTriviaIds.current, ...triviaQuestions.map(q => q._id).filter(Boolean)];
+    // Keep only the last 30 so the pool doesn't get fully exhausted forever
+    seenTriviaIds.current = newSeen.slice(-30);
+    // Clear trivia so next play always fetches fresh questions
+    setTriviaQuestions([]);
     setActiveGame(null);
   };
 
