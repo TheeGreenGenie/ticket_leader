@@ -314,7 +314,7 @@ class SocketService {
   }
 
   connect(sessionId) {
-    this.socket = io('http://localhost:5000', {
+    this.socket = io('http://127.0.0.1:5000', {
       query: { sessionId }
     });
 
@@ -628,3 +628,4 @@ Platinum: 81-100
 **Status:** Planning Phase Complete
 **Next Step:** Create dev-live-queue branch and begin Phase 1 implementation
 **Last Updated:** February 21, 2026
+

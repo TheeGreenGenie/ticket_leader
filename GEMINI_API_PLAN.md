@@ -363,13 +363,13 @@ router.get('/artists/:artistId/trivia/generate', geminiLimiter, async (req, res)
 ### 7.1 Manual Testing
 ```bash
 # Test AI generation
-curl "http://localhost:5001/api/content/artists/{artistId}/trivia/generate?count=3"
+curl "http://127.0.0.1:5001/api/content/artists/{artistId}/trivia/generate?count=3"
 
 # Test hybrid mode
-curl "http://localhost:5001/api/content/artists/{artistId}/trivia?useAI=true&limit=5"
+curl "http://127.0.0.1:5001/api/content/artists/{artistId}/trivia?useAI=true&limit=5"
 
 # Test fallback (without API key)
-curl "http://localhost:5001/api/content/artists/{artistId}/trivia?useAI=true"
+curl "http://127.0.0.1:5001/api/content/artists/{artistId}/trivia?useAI=true"
 ```
 
 ### 7.2 Unit Tests
@@ -408,3 +408,4 @@ curl "http://localhost:5001/api/content/artists/{artistId}/trivia?useAI=true"
 - Validate artistId exists before making API calls
 - Sanitize artist names to prevent prompt injection
 - Rate limit to prevent abuse
+

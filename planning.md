@@ -711,7 +711,7 @@ npm install
 npm run dev
 
 # 4. Verify everything loads
-# Open browser to http://localhost:5173
+# Open browser to http://127.0.0.1:5173
 # Check field scale first!
 
 # 5. Deploy when ready

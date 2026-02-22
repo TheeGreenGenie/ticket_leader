@@ -14,7 +14,7 @@ BisonHacks/
 ├── styles.css            # Original stylesheet (reference only)
 ├── frontend/             # React + Vite app
 │   ├── index.html
-│   ├── vite.config.js    # Dev server + /api proxy to localhost:5000
+│   ├── vite.config.js    # Dev server + /api proxy to 127.0.0.1:5000
 │   └── src/
 │       ├── main.jsx              # ReactDOM entry point
 │       ├── App.jsx               # Router: / → LoginPage, /dashboard → DashboardPage
@@ -54,7 +54,7 @@ BisonHacks/
 
 ## API Endpoints
 
-Base URL (dev): `http://localhost:5000`
+Base URL (dev): `http://127.0.0.1:5000`
 
 | Method | Path                  | Body                          | Response                        |
 |--------|-----------------------|-------------------------------|---------------------------------|
@@ -77,7 +77,7 @@ Base URL (dev): `http://localhost:5000`
 ## Environment Variables (`server/.env`)
 
 ```
-MONGO_URI=mongodb://localhost:27017/ticketleader
+MONGO_URI=mongodb://127.0.0.1:27017/ticketleader
 JWT_SECRET=ticketleader_super_secret_change_me_in_production
 PORT=5000
 ```
@@ -95,10 +95,10 @@ npm run dev        # uses nodemon
 **Terminal 2 — Frontend:**
 ```bash
 cd frontend
-npm run dev        # starts at http://localhost:5173
+npm run dev        # starts at http://127.0.0.1:5173
 ```
 
-Vite proxies all `/api/*` requests to `http://localhost:5000`, so no CORS issues in development.
+Vite proxies all `/api/*` requests to `http://127.0.0.1:5000`, so no CORS issues in development.
 
 ---
 
@@ -108,3 +108,4 @@ Vite proxies all `/api/*` requests to `http://localhost:5000`, so no CORS issues
 - **JWT in localStorage** — simple for now; can be upgraded to httpOnly cookies when needed.
 - **`backend/` folder is untouched** — will be integrated separately in a future phase.
 - **Proxy in `vite.config.js`** — keeps the frontend API calls at `/api/*` so switching from dev to prod only requires changing the proxy target or a base URL env var.
+
