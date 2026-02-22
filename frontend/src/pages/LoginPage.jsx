@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login, signup } from '../api/auth';
-import '../styles/styles.css';
+import ticketLogo from '../assets/ticket.PNG';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState(null); // null | 'login' | 'signup'
+  const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,84 +43,101 @@ export default function LoginPage() {
   }
 
   return (
-    <>
-      {/* Mirrors login.html: hero banner */}
-      <div className="heroBanner">
-        <h1>TicketLeader</h1>
-        <img alt="" />
+    <div className="login-page">
+      {/* Top brand bar */}
+      <div className="login-hero">
+        <div className="login-hero-brand">
+          <img src={ticketLogo} alt="TicketLeader" />
+          <h1>TicketLeader</h1>
+        </div>
+        <p>Your gateway to live events</p>
       </div>
 
-      {/* Mirrors login.html: .lands with Login + Sign Up buttons */}
-      <div className="lands">
-        <div className="lands-buttons">
-          <button onClick={() => handleModeSwitch('login')}>Login</button>
-          <button onClick={() => handleModeSwitch('signup')}>Sign Up</button>
+      {/* Form area */}
+      <div className="login-body">
+        <div className="auth-tabs">
+          <button
+            className={`auth-tab${mode === 'login' ? ' active' : ''}`}
+            onClick={() => handleModeSwitch('login')}
+          >
+            Log In
+          </button>
+          <button
+            className={`auth-tab${mode === 'signup' ? ' active' : ''}`}
+            onClick={() => handleModeSwitch('signup')}
+          >
+            Sign Up
+          </button>
         </div>
 
-        {/* Inline form — appears below buttons when a mode is selected */}
-        {mode === 'login' && (
-          <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <p className="auth-form-title">
+            {mode === 'login' ? 'Log in to your account' : 'Create an account'}
+          </p>
+
+          {mode === 'signup' && (
+            <div className="auth-field">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="John Smith"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          )}
+
+          <div className="auth-field">
+            <label>Email</label>
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
               required
             />
+          </div>
+
+          <div className="auth-field">
+            <label>Password</label>
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
               required
             />
-            {error && <p className="auth-error">{error}</p>}
-            <button type="submit" disabled={loading}>
-              {loading ? 'Logging in…' : 'Login'}
-            </button>
-          </form>
-        )}
+          </div>
 
-        {mode === 'signup' && (
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            {error && <p className="auth-error">{error}</p>}
-            <button type="submit" disabled={loading}>
-              {loading ? 'Creating account…' : 'Sign Up'}
-            </button>
-          </form>
-        )}
+          {error && <p className="auth-error">{error}</p>}
+
+          <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
+            {loading
+              ? mode === 'login'
+                ? 'Logging in…'
+                : 'Creating account…'
+              : mode === 'login'
+              ? 'Log In'
+              : 'Sign Up'}
+          </button>
+        </form>
+
+        <p style={{ marginTop: '20px', fontSize: '0.875rem', color: 'var(--muted)' }}>
+          <Link to="/" style={{ color: 'var(--accent)' }}>← Back to Home</Link>
+        </p>
       </div>
 
-      {/* Mirrors shared footer */}
-      <div className="footer">
-        <p>TicketLeader 2026 ©</p>
-      </div>
-    </>
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-inner">
+            <p className="footer-copy">© 2026 TicketLeader. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }

@@ -10,6 +10,18 @@ body {
   font-family: sans-serif;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
 /* ── Dashboard: Header (from base.html) ── */
 .header {
   display: flex;
@@ -174,3 +186,7 @@ div.walkthrough > ul.dropdown.walkthrough:hover {
   font-size: 0.85rem;
   text-align: center;
 }
+
+
+
+

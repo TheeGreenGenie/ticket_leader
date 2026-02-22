@@ -1,27 +1,21 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import '../styles/styles.css';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
 
-  // Redirect to login if no token (protected route)
   useEffect(() => {
     if (!localStorage.getItem('token')) {
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate]);
 
   return (
-    <>
-      {/* Mirrors base.html */}
-      <Header />
-      <Navbar />
-      <div className="body"></div>
-      <Footer />
-    </>
+    <div className="dashboard-body">
+      <div className="container">
+        <p className="dashboard-welcome">Welcome back</p>
+        <p className="dashboard-sub">Your tickets and upcoming events will appear here.</p>
+      </div>
+    </div>
   );
 }
