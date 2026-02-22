@@ -1,0 +1,56 @@
+[
+  {
+    "artistSlug": "taylor-swift",
+    "eventName": "The Eras Tour",
+    "venue": "MetLife Stadium",
+    "city": "East Rutherford, NJ",
+    "date": "2026-06-15T19:00:00.000Z",
+    "queueCapacity": 10000,
+    "isActive": true
+  },
+  {
+    "artistSlug": "taylor-swift",
+    "eventName": "The Eras Tour",
+    "venue": "SoFi Stadium",
+    "city": "Los Angeles, CA",
+    "date": "2026-07-20T19:00:00.000Z",
+    "queueCapacity": 12000,
+    "isActive": true
+  },
+  {
+    "artistSlug": "drake",
+    "eventName": "It's All a Blur Tour",
+    "venue": "Scotiabank Arena",
+    "city": "Toronto, ON",
+    "date": "2026-05-10T20:00:00.000Z",
+    "queueCapacity": 8000,
+    "isActive": true
+  },
+  {
+    "artistSlug": "drake",
+    "eventName": "It's All a Blur Tour",
+    "venue": "Madison Square Garden",
+    "city": "New York, NY",
+    "date": "2026-06-05T20:00:00.000Z",
+    "queueCapacity": 9000,
+    "isActive": true
+  },
+  {
+    "artistSlug": "beyonce",
+    "eventName": "Renaissance World Tour",
+    "venue": "State Farm Arena",
+    "city": "Atlanta, GA",
+    "date": "2026-08-12T19:30:00.000Z",
+    "queueCapacity": 11000,
+    "isActive": true
+  },
+  {
+    "artistSlug": "beyonce",
+    "eventName": "Renaissance World Tour",
+    "venue": "Soldier Field",
+    "city": "Chicago, IL",
+    "date": "2026-08-25T19:30:00.000Z",
+    "queueCapacity": 10000,
+    "isActive": true
+  }
+]
