@@ -335,8 +335,8 @@ npm start
 ```
 
 **Access:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000/docs
+- Frontend: http://127.0.0.1:3000
+- Backend API: http://127.0.0.1:8000/docs
 
 ## 🎯 Demo Strategy for Judges
 
@@ -486,3 +486,4 @@ npm start
 **Last Updated:** February 21, 2026
 **Status:** Phase 1 Complete, Ready for Demo
 **Next Steps:** Phase 2 AI Integration
+
