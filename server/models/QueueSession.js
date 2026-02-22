@@ -61,7 +61,16 @@ const queueSessionSchema = new mongoose.Schema({
   lastActivity: {
     type: Date,
     default: Date.now
-  }
+  },
+  ipAddress: {
+    type: String,
+    default: null
+  },
+  isFlagged: {
+    type: Boolean,
+    default: false
+  },
+  flagReasons: [{ type: String }]
 });
 
 // Compound index for efficient queries
