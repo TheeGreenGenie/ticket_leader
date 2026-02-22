@@ -80,6 +80,14 @@ export default function TriviaGame({ questions, sessionId, onComplete, onTrustUp
     }
   }, [timeLeft, isAnswered, handleAnswer]);
 
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="trivia-loading">
+        <p>No trivia questions available for this artist right now.</p>
+      </div>
+    );
+  }
+
   if (!currentQuestion) {
     return <div className="trivia-loading">Loading questions...</div>;
   }

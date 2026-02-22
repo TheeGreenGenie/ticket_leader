@@ -27,7 +27,6 @@ export default function Header() {
               <Link to="/live-queue" className="nav-link">Live Queue</Link>
               <Link to="/my-tickets" className="nav-link">My Tickets</Link>
               <Link to="/stadium" className="nav-link">3D Map</Link>
-              <Link to="/walkthrough" className="nav-link">3D Walkthrough</Link>
               <div className="nav-divider" />
               <div className="user-menu">
                 <span className="user-greeting">Hey, {username || 'User'}</span>

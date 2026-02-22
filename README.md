@@ -1,178 +1,167 @@
-<div align="center">
+# TicketLeader
 
-# 🎫 TicketLeader
+A revolutionary ticketing platform that combines fair queue management with gamified bot detection. Built for BisonHacks 2026.
 
-### The Queue IS the Show.
+![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?logo=mongodb)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-010101?logo=socket.io)
+![Three.js](https://img.shields.io/badge/Three.js-0.183-000000?logo=three.js)
 
-**AI-powered mini-games verify fans, not CAPTCHAs — then a voice-guided 3D walkthrough gets every fan to their seat.**
+## Features
 
-[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
-[![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io)
-[![Three.js](https://img.shields.io/badge/Three.js-0.183-000000?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org)
-[![Gemini](https://img.shields.io/badge/Google_Gemini-1.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
-
-<br/>
-
-*Built for BisonHacks 2026 · Howard University · Theme: Leveraging AI for Truth & Service*
-
-</div>
-
----
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-- [Project Structure](#-project-structure)
-- [API Endpoints](#-api-endpoints)
-- [Trust Score System](#-trust-score-system)
-- [3D Stadium Controls](#-3d-stadium-controls)
-- [Database Models](#-database-models)
-- [Security](#-security)
-- [Team](#-team)
-
----
-
-## ✨ Features
-
-### 🎮 Live Queue System
-> Real-time queue with gamified bot detection — fans play, bots get caught.
-
+### Live Queue System
 - Real-time queue position updates via WebSocket
 - Trust score-based queue prioritization
 - Estimated wait time calculations
 - Session persistence across page reloads
 
-### 🛡️ Multi-Layer Bot Detection
+### Multi-Layer Bot Detection
+1. **reCAPTCHA** - Google reCAPTCHA on signup/login
+2. **Trivia Gate** - Artist knowledge verification before queue entry
+3. **IP Flagging** - Detects multiple sessions from same IP
+4. **Response Analysis** - Penalizes instant/bot-like responses
+5. **Behavioral Tracking** - Mouse movement, scroll patterns, click analysis
+6. **Biometric Verification** - WebAuthn (Face ID/Touch ID) for flagged users
 
-| Layer | Method | Description |
-|:-----:|--------|-------------|
-| 1 | **reCAPTCHA** | Google reCAPTCHA on signup/login |
-| 2 | **Trivia Gate** | Artist knowledge verification before queue entry |
-| 3 | **IP Flagging** | Detects multiple sessions from same IP |
-| 4 | **Response Analysis** | Penalizes instant/bot-like responses |
-| 5 | **Behavioral Tracking** | Mouse movement, scroll patterns, click analysis |
-| 6 | **Biometric Verification** | WebAuthn (Face ID/Touch ID) for flagged users |
+### Gamification
+- **Trivia Games** - 10-second timer, difficulty-based rewards (+5-15 trust)
+- **Fan Polls** - Vote on artist topics (+3-5 trust)
+- **Trust Levels** - Bronze, Silver, Gold, Platinum tiers
+- **AI-Generated Questions** - Google Gemini creates dynamic, location-aware trivia
 
-### 🏆 Gamification
-
-- **Trivia Games** — 10-second timer, difficulty-based rewards (+5 to +15 trust)
-- **Fan Polls** — Vote on artist topics (+3 to +5 trust)
-- **Trust Levels** — Bronze → Silver → Gold → Platinum tiers
-- **AI-Generated Questions** — Google Gemini creates dynamic, location-aware trivia
-
-### 🏟️ 3D Stadium Experience
-
+### 3D Stadium Experience
 - Interactive 80,000-seat stadium visualization (AT&T Stadium)
-- Three navigation modes: **Orbit**, **Walkthrough**, **Parking**
+- Three navigation modes: Orbit, Walkthrough, Parking
 - Seat finder with spoken directions (TTS)
 - Real-time distance and ETA calculations
 - Section highlighting and path routing
 
-### 📍 Location Features
-
+### Location Features
 - Geolocation-based local fan verification
 - Distance calculation to venue (Haversine formula)
 - Local trivia questions for nearby fans
 - Trust boost for verified local attendance
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19, Vite 7, Three.js, React Three Fiber, Socket.IO Client |
+| Backend | Node.js, Express 4, MongoDB 8, Mongoose, Socket.IO |
+| AI | Google Gemini 2.5 Flash |
+| Auth | JWT, bcryptjs, Google reCAPTCHA, WebAuthn |
+| 3D | Three.js, @react-three/fiber, @react-three/drei |
+| DevOps | Docker, Docker Compose, Nginx |
 
-```
-Frontend          Backend           AI & Auth          DevOps
-─────────         ─────────         ─────────          ─────────
-React 19          Node.js           Gemini 1.5 Flash   Docker
-Vite 7            Express 4         JWT + bcrypt       Docker Compose
-Three.js          MongoDB 8         reCAPTCHA          Nginx
-R3F + Drei        Mongoose          WebAuthn
-Socket.IO Client  Socket.IO
-```
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
+- Node.js 16+
+- MongoDB 5.0+ (local or Atlas)
+- Google Gemini API key (optional, for AI trivia)
 
-- **Node.js** 16+
-- **MongoDB** 5.0+ (local or Atlas)
-- **Google Gemini API key** (optional, for AI trivia)
-
-### Quick Start
+### Quick Start (Local Dev)
 
 ```bash
 # Clone the repository
 git clone https://github.com/TheeGreenGenie/ticket_leader.git
 cd ticket_leader
-```
 
-**Backend:**
-```bash
+# Start MongoDB (if not running)
+mongod --dbpath /path/to/data
+
+# Backend
 cd server
-cp .env.example .env    # Configure environment variables
+cp .env.example .env  # Configure environment variables
 npm install
-npm run dev             # http://127.0.0.1:5001
-```
+npm run dev           # Runs on http://127.0.0.1:5001
 
-**Frontend:**
-```bash
+# Frontend (new terminal)
 cd frontend
 npm install
-npm run dev             # http://127.0.0.1:4001
+npm run dev           # Runs on http://127.0.0.1:4001
 ```
 
-### 🐳 Docker Setup
+### Docker Setup
 
-```bash
-docker compose up --build
+#### Prerequisites
+- Docker Engine / Docker Desktop
+- Docker Compose v2 (`docker compose version`)
 
-# Frontend:  http://127.0.0.1:4001
-# Backend:   http://127.0.0.1:5001
-# MongoDB:   mongodb://127.0.0.1:27017
-```
+#### Environment Setup
+Create/edit these files before first run:
 
-### Environment Variables
-
-<details>
-<summary><b>Server</b> (<code>server/.env</code>)</summary>
-
+**`server/.env`** (required):
 ```env
-MONGO_URI=mongodb://127.0.0.1:27017/ticketleader
+MONGO_URI=mongodb://mongo:27017/ticketleader
 JWT_SECRET=your_super_secret_jwt_key_here
 PORT=5001
 CORS_ORIGINS=http://127.0.0.1:4001
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-1.5-flash
 RECAPTCHA_SECRET=your_recaptcha_secret
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
+TICKETMASTER_API_KEY=your_key_here
+LASTFM_API_KEY=your_key_here
 ```
 
-</details>
-
-<details>
-<summary><b>Frontend</b> (<code>frontend/.env</code>)</summary>
-
+**`frontend/.env`** (required):
 ```env
 VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
-</details>
+#### Run
 
----
+```bash
+docker compose up --build -d
+```
 
-## 📁 Project Structure
+- App: `http://127.0.0.1:4001`
+- API health: `http://127.0.0.1:5001/api/health`
+
+#### Verify
+
+```bash
+docker compose ps
+docker compose logs -f server
+docker compose logs -f mongo
+```
+
+#### Populate Events
+
+Seed local starter data:
+```bash
+docker compose exec -T server node scripts/seedDatabase.js
+```
+
+Sync large Ticketmaster dataset:
+```bash
+docker compose exec -T server node scripts/runSync.js
+```
+
+#### Stop
+
+```bash
+docker compose down
+
+# Remove DB volume too:
+docker compose down -v
+```
+
+#### Cross-Environment Notes
+- This setup is portable across Windows, macOS, and Linux.
+- For remote Linux servers, bind publicly with:
+```bash
+HOST_BIND_IP=0.0.0.0 docker compose up --build -d
+```
+
+## Project Structure
 
 ```
 ticket_leader/
-│
-├── 🎨 frontend/                    # React + Vite
+├── frontend/                    # React + Vite frontend
 │   ├── src/
-│   │   ├── pages/                  # 9 page components
+│   │   ├── pages/              # Page components (9 pages)
 │   │   │   ├── LoginPage.jsx       # Auth with reCAPTCHA
 │   │   │   ├── DashboardPage.jsx   # Event discovery
 │   │   │   ├── LiveQueuePage.jsx   # Main queue experience
@@ -180,204 +169,145 @@ ticket_leader/
 │   │   │   ├── WalkthroughPage.jsx # Character walkthrough
 │   │   │   ├── VerifyPage.jsx      # Biometric verification
 │   │   │   └── ...
-│   │   ├── components/             # Reusable UI
+│   │   ├── components/         # Reusable UI components
 │   │   │   ├── games/              # TriviaGame, PollGame
-│   │   │   └── queue/              # QueueStatus, TrustLevelBadge
-│   │   ├── stadium/                # 3D stadium components (17 files)
-│   │   ├── api/                    # API client modules
-│   │   ├── services/               # Socket, location, TTS
-│   │   └── utils/                  # Behavior collector, helpers
-│   └── Dockerfile
+│   │   │   ├── queue/              # QueueStatus, TrustLevelBadge
+│   │   │   └── ...
+│   │   ├── stadium/            # 3D stadium components (17 files)
+│   │   ├── api/                # API client modules
+│   │   ├── services/           # Socket, location, TTS services
+│   │   └── utils/              # Behavior collector, helpers
+│   ├── Dockerfile
+│   └── vite.config.js
 │
-├── ⚙️ server/                      # Node.js + Express
+├── server/                      # Node.js + Express backend
 │   ├── routes/
-│   │   ├── auth.js                 # Signup, login, JWT
-│   │   ├── queue.js                # Queue join, status, location
-│   │   ├── games.js                # Game submission, trust scoring
-│   │   ├── content.js              # Artists, events, trivia, polls
-│   │   └── tts.js                  # Text-to-speech API
-│   ├── models/                     # MongoDB schemas (7 models)
+│   │   ├── auth.js             # Signup, login, JWT
+│   │   ├── queue.js            # Queue join, status, location
+│   │   ├── games.js            # Game submission, trust scoring
+│   │   ├── content.js          # Artists, events, trivia, polls
+│   │   └── tts.js              # Text-to-speech API
+│   ├── models/                 # MongoDB schemas (7 models)
 │   ├── services/
 │   │   ├── queueManager.js         # Queue logic
 │   │   ├── trustScoreCalculator.js # Trust scoring
 │   │   └── geminiService.js        # AI trivia generation
-│   ├── sockets/                    # Socket.IO handlers
-│   ├── seeds/                      # Seed data
-│   └── Dockerfile
+│   ├── sockets/                # Socket.IO handlers
+│   ├── seeds/                  # Seed data (artists, events, trivia)
+│   ├── Dockerfile
+│   └── index.js
 │
-├── docker-compose.yml
-└── docs/
+├── docker-compose.yml          # Multi-container orchestration
+└── docs/                       # Additional documentation
 ```
 
----
+## API Endpoints
 
-## 🔌 API Endpoints
-
-<details>
-<summary><b>Authentication</b></summary>
-
+### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/auth/signup` | Create account with reCAPTCHA |
-| `POST` | `/api/auth/login` | User login |
+| POST | `/api/auth/signup` | Create account with reCAPTCHA |
+| POST | `/api/auth/login` | User login |
 
-</details>
-
-<details>
-<summary><b>Queue Management</b></summary>
-
+### Queue Management
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/queue/join` | Join event queue (requires trivia) |
-| `GET` | `/api/queue/status/:sessionId` | Get queue position & trust |
-| `POST` | `/api/queue/leave/:sessionId` | Leave queue |
-| `POST` | `/api/queue/location/:sessionId` | Save geolocation data |
-| `POST` | `/api/queue/reorder/:eventId` | Reorder by trust scores |
+| POST | `/api/queue/join` | Join event queue (requires trivia) |
+| GET | `/api/queue/status/:sessionId` | Get queue position & trust |
+| POST | `/api/queue/leave/:sessionId` | Leave queue |
+| POST | `/api/queue/location/:sessionId` | Save geolocation data |
+| POST | `/api/queue/reorder/:eventId` | Reorder by trust scores |
 
-</details>
-
-<details>
-<summary><b>Content</b></summary>
-
+### Content
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/content/artists` | List all artists |
-| `GET` | `/api/content/events` | Get active events |
-| `GET` | `/api/content/artists/:id/trivia` | Get trivia (AI or static) |
-| `GET` | `/api/content/artists/:id/trivia/local` | Location-themed trivia |
-| `GET` | `/api/content/artists/:id/polls` | Get poll questions |
+| GET | `/api/content/artists` | List all artists |
+| GET | `/api/content/events` | Get active events |
+| GET | `/api/content/artists/:id/trivia` | Get trivia (AI or static) |
+| GET | `/api/content/artists/:id/trivia/local` | Location-themed trivia |
+| GET | `/api/content/artists/:id/polls` | Get poll questions |
 
-</details>
-
-<details>
-<summary><b>Games & Trust</b></summary>
-
+### Games & Trust
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/games/submit` | Submit game result |
-| `GET` | `/api/games/history/:sessionId` | Game history |
-| `POST` | `/api/games/behavior/stream` | Record behavioral data |
-| `GET` | `/api/games/trust/:sessionId` | Trust score breakdown |
+| POST | `/api/games/submit` | Submit game result |
+| GET | `/api/games/history/:sessionId` | Game history |
+| POST | `/api/games/behavior/stream` | Record behavioral data |
+| GET | `/api/games/trust/:sessionId` | Trust score breakdown |
 
-</details>
-
----
-
-## 📊 Trust Score System
-
-```
-                    ┌─────────────────────────┐
-                    │     BASE SCORE: 50      │
-                    └────────────┬────────────┘
-                                 │
-          ┌──────────────────────┼──────────────────────┐
-          │                      │                      │
-    ┌─────┴─────┐          ┌─────┴─────┐          ┌─────┴─────┐
-    │  TRIVIA   │          │   POLLS   │          │ BEHAVIOR  │
-    │ +5 / +10  │          │  +3 / +5  │          │  +2 bonus │
-    │   / +15   │          │           │          │ or -10    │
-    └───────────┘          └───────────┘          └───────────┘
-```
+## Trust Score System
 
 | Action | Points |
-|--------|:------:|
-| Base score | `50` |
-| Easy trivia ✅ | `+5` |
-| Medium trivia ✅ | `+10` |
-| Hard trivia ✅ | `+15` |
-| Poll participation | `+3 to +5` |
-| Human-like response (2-8s) | `+2 bonus` |
-| Time in queue | `+1/min (max +20)` |
-| Suspicious IP | `-20` |
-| Bot-like behavior | `-10 per flag` |
+|--------|--------|
+| Base score | 50 |
+| Easy trivia (correct) | +5 |
+| Medium trivia (correct) | +10 |
+| Hard trivia (correct) | +15 |
+| Poll participation | +3-5 |
+| Human-like response time (2-8s) | +2 bonus |
+| Time in queue | +1/minute (max +20) |
+| Suspicious IP | -20 |
+| Bot-like behavior | -10 per flag |
 
 ### Trust Levels
+- **Bronze**: 0-40 points
+- **Silver**: 41-60 points (default)
+- **Gold**: 61-80 points
+- **Platinum**: 81-100 points
 
-| Tier | Score | Badge |
-|------|:-----:|:-----:|
-| 🥉 Bronze | 0–40 | Needs verification |
-| 🥈 Silver | 41–60 | Default |
-| 🥇 Gold | 61–80 | Trusted fan |
-| 💎 Platinum | 81–100 | Verified superfan |
-
----
-
-## 🏟️ 3D Stadium Controls
+## 3D Stadium Controls
 
 ### Orbit Mode (Default)
-| Action | Control |
-|--------|---------|
-| Rotate camera | Right-drag |
-| Zoom | Scroll wheel |
-| Select section | Click |
+- **Right-drag**: Rotate camera
+- **Scroll**: Zoom in/out
+- **Click section**: Highlight seats
 
 ### Walkthrough Mode
-| Action | Control |
-|--------|---------|
-| Move | `W` `A` `S` `D` |
-| Float up / down | `O` / `L` |
-| Snap to floor | `Space` |
-| Zoom camera | `Q` / `E` |
-| Rotate view | Arrow keys |
-| Camera rotation | Left-drag |
+- **WASD**: Move character
+- **O/L**: Float up/down
+- **Space**: Snap to floor
+- **Q/E**: Zoom camera
+- **Arrow keys**: Rotate view
+- **Left-drag**: Camera rotation
 
 ### Seat Finder
-1. Enter section (`L1`–`L54`, `C1`–`C22`, `U1`–`U36`)
-2. Optionally enter row and seat number
-3. Click **"Find Seat"** for 3D navigation with spoken directions
+1. Enter section (L1-L54, C1-C22, U1-U36)
+2. Optionally enter row and seat
+3. Click "Find Seat" for 3D navigation with spoken directions
 
----
+## Database Models
 
-## 🗄️ Database Models
+- **User** - Authentication credentials
+- **QueueSession** - Queue position, trust score, behavioral data
+- **Event** - Concert details, venue coordinates
+- **Artist** - Artist profiles
+- **TriviaQuestion** - Quiz questions with difficulty levels
+- **PollQuestion** - Fan polls (choice or slider)
+- **GameResult** - Game submissions and scores
+- **BehavioralStream** - Mouse/scroll/click patterns
 
-| Model | Purpose |
-|-------|---------|
-| `User` | Authentication credentials |
-| `QueueSession` | Queue position, trust score, behavioral data |
-| `Event` | Concert details, venue coordinates |
-| `Artist` | Artist profiles |
-| `TriviaQuestion` | Quiz questions with difficulty levels |
-| `PollQuestion` | Fan polls (choice or slider) |
-| `GameResult` | Game submissions and scores |
-| `BehavioralStream` | Mouse/scroll/click patterns |
+## Security Features
 
----
+- JWT authentication (7-day expiry)
+- bcrypt password hashing (10 rounds)
+- reCAPTCHA verification
+- WebAuthn biometric verification
+- IP-based rate limiting
+- CORS protection
+- Session expiry cleanup (2+ hours)
 
-## 🔒 Security
+## Contributing
 
-- **JWT** authentication (7-day expiry)
-- **bcrypt** password hashing (10 rounds)
-- **Google reCAPTCHA** verification
-- **WebAuthn** biometric verification (Face ID / Touch ID)
-- **IP-based** rate limiting
-- **CORS** protection
-- **Session expiry** cleanup (2+ hours)
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
----
+## Team
 
-## 👥 Team
+Built by the TicketLeader team for BisonHacks 2026.
 
-Built by the **TicketLeader** team for **BisonHacks 2026** at Howard University.
+## License
 
-| Contributor | GitHub |
-|-------------|--------|
-| Soloman Shasanmi | [@TheeGreenGenie](https://github.com/TheeGreenGenie) |
-| joslew22 | [@joslew22](https://github.com/joslew22) |
-| danieladewale | [@danieladewale](https://github.com/danieladewale) |
-| masonbrogden | [@masonbrogden](https://github.com/masonbrogden) |
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
----
-
-<div align="center">
-
-*Built with ❤️ at Howard University · BisonHacks 2026*
-
-**AI for Truth & Service**
-
-</div>
+This project is licensed under the MIT License.

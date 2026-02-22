@@ -23,41 +23,15 @@ function signToken(user) {
   );
 }
 
-// ── Helper: verify reCAPTCHA token ───────────────────────────
-const TEST_SECRET = '6LeIxAcTAAAAAGG-vFI1TnRWxMZ5SgjC19UZthAD';
-
-async function verifyCaptcha(token) {
-  const secret = process.env.RECAPTCHA_SECRET;
-  // If no official secret is configured, CAPTCHA is disabled.
-  if (!secret) return true;
-  if (!token) return false;
-  // Google's test secret key always returns success for any non-empty token
-  if (secret === TEST_SECRET) return true;
-  const params = new URLSearchParams({
-    secret,
-    response: token,
-  });
-  const res = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
-    method: 'POST',
-    body: params,
-  });
-  const data = await res.json();
-  return data.success === true;
-}
-
 // ── POST /api/auth/signup ────────────────────────────────────
 router.post('/signup', async (req, res) => {
-  const { name, email, password, captchaToken } = req.body;
+  const { name, email, password } = req.body;
 
   if (!name || !email || !password)
     return res.status(400).json({ message: 'All fields are required.' });
 
   if (password.length < 6)
     return res.status(400).json({ message: 'Password must be at least 6 characters.' });
-
-  const captchaOk = await verifyCaptcha(captchaToken).catch(() => false);
-  if (!captchaOk)
-    return res.status(400).json({ message: 'CAPTCHA verification failed. Please try again.' });
 
   try {
     const existing = await User.findOne({ email });
@@ -77,14 +51,10 @@ router.post('/signup', async (req, res) => {
 
 // ── POST /api/auth/login ─────────────────────────────────────
 router.post('/login', async (req, res) => {
-  const { email, password, captchaToken } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password)
     return res.status(400).json({ message: 'Email and password are required.' });
-
-  const captchaOk = await verifyCaptcha(captchaToken).catch(() => false);
-  if (!captchaOk)
-    return res.status(400).json({ message: 'CAPTCHA verification failed. Please try again.' });
 
   try {
     const user = await User.findOne({ email });

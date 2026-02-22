@@ -41,7 +41,7 @@ export async function getEvent(eventId) {
 }
 
 export async function getLocalTrivia(artistId, city, count = 2) {
-  const res = await API.get(`/artists/${artistId}/trivia/local`, {
+  const res = await apiClient.get(`/content/artists/${artistId}/trivia/local`, {
     params: { city, count }
   });
   return res.data;

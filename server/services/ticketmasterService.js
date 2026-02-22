@@ -5,6 +5,17 @@ const Event  = require('../models/Event');
 const BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 const PAGE_SIZE = 200; // max allowed by Ticketmaster
 
+// Validate that a URL is an absolute HTTPS URL — OS-agnostic check.
+// Last.fm deprecated artist images in 2019; those CDN URLs are always broken,
+// so we reject them explicitly regardless of which machine runs this.
+function isValidImageUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const t = url.trim();
+  if (!t.startsWith('https://')) return false;
+  if (t.includes('last.fm') || t.includes('lastfm')) return false;
+  return true;
+}
+
 // Slugify a name for use as Artist.slug
 function slugify(name) {
   return name
@@ -69,12 +80,16 @@ function fetchPage(apiKey, startDateTime, endDateTime, page) {
 
 // Upsert one artist, return its _id
 async function upsertArtist(attraction) {
-  const name  = attraction.name?.trim();
+  const name = attraction.name?.trim();
   if (!name) return null;
 
-  const slug     = slugify(name);
-  const imageUrl = pickImage(attraction.images);
-  const genre    = buildGenre(attraction.classifications);
+  const slug  = slugify(name);
+  const genre = buildGenre(attraction.classifications);
+
+  // Only store the image if it passes the HTTPS + domain check.
+  // Last.fm images are rejected here — they have been broken since 2019.
+  const rawImage = pickImage(attraction.images);
+  const imageUrl = isValidImageUrl(rawImage) ? rawImage.trim() : '';
 
   const artist = await Artist.findOneAndUpdate(
     { slug },

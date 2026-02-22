@@ -5,6 +5,11 @@
 FROM node:20-slim AS build
 WORKDIR /app
 
+# Build-time arg for reCAPTCHA — Vite bakes VITE_* vars at build time,
+# so this must be passed here, not at runtime.
+ARG VITE_RECAPTCHA_SITE_KEY
+ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY}
+
 # Suppress audit/fund noise; raise network timeout for slow registries
 RUN npm config set audit false \
  && npm config set fund false \

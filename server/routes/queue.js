@@ -17,13 +17,13 @@ router.post('/join', async (req, res) => {
       return res.status(400).json({ error: 'Event ID is required' });
     }
 
-    // Layer 2: Trivia gate — verify answer before allowing queue join
-    if (!triviaQuestionId || triviaAnswer === null || triviaAnswer === undefined) {
-      return res.status(403).json({ message: 'Trivia verification required.' });
-    }
-    const gateQuestion = await TriviaQuestion.findById(triviaQuestionId);
-    if (!gateQuestion || parseInt(triviaAnswer) !== gateQuestion.correctAnswer) {
-      return res.status(403).json({ message: 'Incorrect answer. Please try again.' });
+    // Layer 2: Trivia gate — only enforce when a question was actually presented
+    // (triviaQuestionId === null means no question was available, so we let it through)
+    if (triviaQuestionId) {
+      const gateQuestion = await TriviaQuestion.findById(triviaQuestionId);
+      if (!gateQuestion || parseInt(triviaAnswer) !== gateQuestion.correctAnswer) {
+        return res.status(403).json({ message: 'Incorrect answer. Please try again.' });
+      }
     }
 
     // Layer 3: IP flagging — detect multiple sessions for the SAME event from one IP

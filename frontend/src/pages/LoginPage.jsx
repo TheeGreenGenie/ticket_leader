@@ -1,11 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { login, signup } from '../api/auth';
 import './LoginPage.css';
-
-const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-const CAPTCHA_ENABLED = Boolean(SITE_KEY);
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,8 +9,6 @@ export default function LoginPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [captchaPassed, setCaptchaPassed] = useState(false);
-  const recaptchaRef = useRef(null);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,27 +18,18 @@ export default function LoginPage() {
     setMode(newMode);
     setError('');
     setForm({ name: '', email: '', password: '' });
-    setCaptchaPassed(false);
-    recaptchaRef.current?.reset();
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-
-    const captchaToken = recaptchaRef.current?.getValue();
-    if (CAPTCHA_ENABLED && !captchaToken) {
-      setError('Please complete the CAPTCHA.');
-      return;
-    }
-
     setLoading(true);
     try {
       let data;
       if (mode === 'login') {
-        data = await login(form.email, form.password, captchaToken);
+        data = await login(form.email, form.password);
       } else {
-        data = await signup(form.name, form.email, form.password, captchaToken);
+        data = await signup(form.name, form.email, form.password);
       }
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
@@ -53,8 +38,6 @@ export default function LoginPage() {
     } catch (err) {
       const msg = err?.response?.data?.message || 'Server unavailable. Please try again later.';
       setError(msg);
-      recaptchaRef.current?.reset();
-      setCaptchaPassed(false);
     } finally {
       setLoading(false);
     }
@@ -181,15 +164,6 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <div style={{ marginBottom: 12 }}>
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={SITE_KEY}
-                    onChange={() => setCaptchaPassed(true)}
-                    onExpired={() => setCaptchaPassed(false)}
-                  />
-                </div>
-
                 {error && (
                   <div className="form-error">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -202,7 +176,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   className="btn-submit"
-                  disabled={loading || (CAPTCHA_ENABLED && !captchaPassed)}
+                  disabled={loading}
                 >
                   {loading ? (
                     <>
