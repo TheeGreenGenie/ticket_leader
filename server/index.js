@@ -10,6 +10,7 @@ const queueRoutes = require('./routes/queue');
 const contentRoutes = require('./routes/content');
 const gamesRoutes = require('./routes/games');
 const syncRoutes = require('./routes/sync');
+const ttsRoutes = require('./routes/tts');
 
 const { initializeQueueSocket, startPeriodicUpdates } = require('./sockets/queueSocket');
 
@@ -40,6 +41,7 @@ app.use('/api/queue', queueRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/games', gamesRoutes);
 app.use('/api/sync', syncRoutes);
+app.use('/api/tts', ttsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
