@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const requiredEnv = ['MONGO_URI', 'JWT_SECRET', 'RECAPTCHA_SECRET'];
+const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
 const optionalEnv = ['TICKETMASTER_API_KEY', 'LASTFM_API_KEY', 'GEMINI_API_KEY'];
 
 const requiredDeps = ['express', 'mongoose', 'cors', 'socket.io', 'bcryptjs', 'jsonwebtoken'];
