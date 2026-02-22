@@ -113,7 +113,7 @@ div.walkthrough > ul.dropdown.walkthrough:hover {
   justify-content: center;
   align-items: center;
   gap: 25px;
-  height: 25vh;
+  min-height: 25vh;
   flex-direction: column;
 }
 
