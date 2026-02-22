@@ -25,13 +25,6 @@ export default function Navbar() {
         </ul>
       </div>
 
-      <div className="walkthrough">
-        <li>3D Walkthrough</li>
-        <ul className="dropdown walkthrough">
-          <li onClick={() => navigate('/stadium')} style={{ cursor: 'pointer' }}>Stadium View</li>
-          <li onClick={() => navigate('/stadium')} style={{ cursor: 'pointer' }}>Seat Walkthrough</li>
-        </ul>
-      </div>
     </ul>
   );
 }

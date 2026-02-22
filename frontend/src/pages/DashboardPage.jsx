@@ -154,8 +154,12 @@ export default function DashboardPage() {
                 return filteredEvents.map((event, index) => {
                   const slug = event.artistId?.slug;
                   const images = FALLBACK_ARTIST_IMAGES[slug];
-                  const apiImage = (event.artistId?.imageUrl || '').trim();
-                  let artistImage = apiImage || null;
+                  // Only use API image if it is an absolute HTTPS URL.
+                  // Rejects broken Last.fm CDN URLs regardless of machine/OS.
+                  const rawApiImage = (event.artistId?.imageUrl || '').trim();
+                  const isValidUrl = rawApiImage.startsWith('https://') &&
+                    !rawApiImage.includes('last.fm') && !rawApiImage.includes('lastfm');
+                  let artistImage = isValidUrl ? rawApiImage : null;
                   if (!artistImage && images) {
                     const count = artistCount[slug] ?? 0;
                     artistImage = images[count % images.length];
