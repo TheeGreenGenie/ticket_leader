@@ -25,6 +25,7 @@ export default function Header() {
           {isLoggedIn ? (
             <>
               <Link to="/dashboard" className="nav-link">Events</Link>
+              <Link to="/walkthrough" className="nav-link">3D Walkthrough</Link>
               <Link to="/my-tickets" className="nav-link">My Tickets</Link>
               <div className="nav-divider" />
               <div className="user-menu">

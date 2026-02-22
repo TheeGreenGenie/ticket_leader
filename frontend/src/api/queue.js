@@ -16,3 +16,8 @@ export async function leaveQueue(sessionId) {
   const res = await API.post(`/leave/${sessionId}`);
   return res.data;
 }
+
+export async function saveLocation(sessionId, locationData) {
+  const res = await API.post(`/location/${sessionId}`, { locationData });
+  return res.data;
+}

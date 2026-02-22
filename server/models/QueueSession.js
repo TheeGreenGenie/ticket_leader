@@ -58,6 +58,36 @@ const queueSessionSchema = new mongoose.Schema({
       default: 0
     }
   },
+  locationData: {
+    granted: {
+      type: Boolean,
+      default: false
+    },
+    distanceMiles: {
+      type: Number,
+      default: null
+    },
+    isLocal: {
+      type: Boolean,
+      default: false
+    },
+    isRegional: {
+      type: Boolean,
+      default: false
+    },
+    nearVenue: {
+      type: Boolean,
+      default: false
+    },
+    city: {
+      type: String,
+      default: null
+    },
+    checkedAt: {
+      type: Date,
+      default: null
+    }
+  },
   lastActivity: {
     type: Date,
     default: Date.now

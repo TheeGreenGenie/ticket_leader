@@ -41,3 +41,10 @@ export async function getEvent(eventId) {
   const res = await API.get(`/events/${eventId}`);
   return res.data;
 }
+
+export async function getLocalTrivia(artistId, city, count = 2) {
+  const res = await API.get(`/artists/${artistId}/trivia/local`, {
+    params: { city, count }
+  });
+  return res.data;
+}

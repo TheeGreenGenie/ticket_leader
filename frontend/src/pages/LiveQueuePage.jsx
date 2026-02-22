@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { joinQueue, getQueueStatus, leaveQueue } from '../api/queue';
-import { getEvent, getTrivia, getPolls } from '../api/content';
+import { joinQueue, getQueueStatus, leaveQueue, saveLocation } from '../api/queue';
+import { getEvent, getTrivia, getPolls, getLocalTrivia } from '../api/content';
 import socketService from '../services/socketService';
 import behaviorCollector from '../utils/behaviorCollector';
+import { checkProximity, isGeolocationSupported } from '../services/locationService';
 import QueueStatus from '../components/queue/QueueStatus';
 import TriviaGame from '../components/games/TriviaGame';
 import PollGame from '../components/games/PollGame';
+import LocationPrompt from '../components/queue/LocationPrompt';
+import LocalFanBadge from '../components/queue/LocalFanBadge';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './LiveQueuePage.css';
@@ -21,6 +24,10 @@ export default function LiveQueuePage() {
   const [event, setEvent] = useState(null);
   const [artistId, setArtistId] = useState(null);
 
+  // Location state
+  const [locationData, setLocationData] = useState(null);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [locationChecked, setLocationChecked] = useState(false);
   // Trivia gate state
   const [gatePhase, setGatePhase] = useState('loading'); // 'loading' | 'trivia' | 'joined'
   const [gateQuestion, setGateQuestion] = useState(null);
@@ -60,6 +67,11 @@ export default function LiveQueuePage() {
           try {
             const session = await getQueueStatus(savedSession);
             setSessionId(savedSession);
+            // Restore location data if available
+            if (session.locationData?.granted) {
+              setLocationData(session.locationData);
+              setLocationChecked(true);
+            }
             setQueueData(session);
             socketService.connect(savedSession);
             behaviorCollector.start(savedSession);
@@ -79,6 +91,13 @@ export default function LiveQueuePage() {
         } else {
           // No trivia available — skip gate and join directly
           await joinNewQueue(null, null, 0, 0);
+        }
+
+        // Show location prompt after a short delay if not already checked
+        if (!session.locationData?.granted && isGeolocationSupported()) {
+          setTimeout(() => {
+            setShowLocationPrompt(true);
+          }, 2000);
         }
       } catch (err) {
         console.error('Failed to initialize queue:', err);
@@ -188,6 +207,34 @@ export default function LiveQueuePage() {
     };
   }, [navigate]);
 
+  // Handle location permission
+  const handleLocationGranted = async () => {
+    if (!event?.coordinates || !sessionId) return;
+
+    try {
+      const result = await checkProximity(event.coordinates);
+
+      if (result.granted) {
+        setLocationData(result);
+
+        // Save to backend
+        await saveLocation(sessionId, result);
+      }
+
+      setLocationChecked(true);
+      setShowLocationPrompt(false);
+    } catch (err) {
+      console.error('Location check failed:', err);
+      setShowLocationPrompt(false);
+    }
+  };
+
+  const handleLocationDismiss = () => {
+    setShowLocationPrompt(false);
+    setLocationChecked(true);
+  };
+
+  // Load game content - with local trivia support
   // Load game content
   const loadGameContent = useCallback(async (gameType) => {
     if (!artistId) return;
@@ -195,6 +242,28 @@ export default function LiveQueuePage() {
     setGamesLoading(true);
     try {
       if (gameType === 'trivia') {
+        let trivia = [];
+
+        // If we have location data with a city, mix in local trivia
+        if (locationData?.granted && locationData?.city) {
+          try {
+            const localTrivia = await getLocalTrivia(artistId, locationData.city, 2);
+            trivia = [...localTrivia];
+            console.log(`Loaded ${localTrivia.length} local trivia questions for ${locationData.city}`);
+          } catch (err) {
+            console.warn('Local trivia not available:', err);
+          }
+        }
+
+        // Fill remaining with regular trivia
+        const regularCount = 5 - trivia.length;
+        if (regularCount > 0) {
+          const regularTrivia = await getTrivia(artistId, { limit: regularCount, useAI: true });
+          trivia = [...trivia, ...regularTrivia];
+        }
+
+        // Shuffle to mix local and regular
+        trivia.sort(() => Math.random() - 0.5);
         const trivia = await getTrivia(artistId, { limit: 5, useAI: true });
         setTriviaQuestions(trivia);
       } else if (gameType === 'poll' && pollQuestions.length === 0) {
@@ -206,7 +275,7 @@ export default function LiveQueuePage() {
     } finally {
       setGamesLoading(false);
     }
-  }, [artistId, pollQuestions.length]);
+  }, [artistId, pollQuestions.length, locationData]);
 
   const startGame = async (gameType) => {
     await loadGameContent(gameType);
@@ -344,6 +413,11 @@ export default function LiveQueuePage() {
       <Header />
       <main className="queue-main">
         <div className="queue-container">
+          {/* Location Badge - shows if location granted */}
+          {locationData?.granted && (
+            <section className="location-badge-section">
+              <LocalFanBadge locationData={locationData} />
+            </section>
           {queueData?.isFlagged && (
             <div className="flag-warning">
               ⚠️ Suspicious activity detected from your network. Your queue position has been adjusted.
@@ -366,6 +440,16 @@ export default function LiveQueuePage() {
             />
           </section>
 
+          {/* Location Prompt - shown once if not checked */}
+          {showLocationPrompt && !locationChecked && (
+            <section className="location-prompt-section">
+              <LocationPrompt
+                onLocationGranted={handleLocationGranted}
+                onDismiss={handleLocationDismiss}
+              />
+            </section>
+          )}
+
           {/* Game Section */}
           <section className="game-section">
             {activeGame === null ? (
@@ -378,6 +462,9 @@ export default function LiveQueuePage() {
                     <span className="game-icon">🎯</span>
                     <h3>Artist Trivia</h3>
                     <p>Test your knowledge about {event?.artistId?.name || 'the artist'}</p>
+                    {locationData?.granted && locationData?.city && (
+                      <span className="game-local-badge">Includes {locationData.city} trivia!</span>
+                    )}
                     <span className="game-reward">+5-15 Trust Points</span>
                   </div>
 

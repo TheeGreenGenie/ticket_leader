@@ -1,0 +1,125 @@
+.local-fan-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(var(--badge-color-rgb, 102, 126, 234), 0.15);
+  border: 1px solid var(--badge-color, var(--color-primary));
+  border-radius: var(--radius-lg);
+  animation: badgeSlideIn 0.4s ease;
+}
+
+.badge-icon {
+  font-size: var(--font-size-2xl);
+  flex-shrink: 0;
+}
+
+.badge-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--badge-color, var(--color-primary));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-description {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-city {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  background: var(--bg-dark-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+/* Badge type variations */
+.local-fan-badge.badge-near-venue {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10B981;
+  animation: badgePulse 2s ease infinite;
+}
+
+.local-fan-badge.badge-near-venue .badge-label {
+  color: #10B981;
+}
+
+.local-fan-badge.badge-local {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #667eea;
+}
+
+.local-fan-badge.badge-local .badge-label {
+  color: #667eea;
+}
+
+.local-fan-badge.badge-regional {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: #8B5CF6;
+}
+
+.local-fan-badge.badge-regional .badge-label {
+  color: #8B5CF6;
+}
+
+.local-fan-badge.badge-traveling {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #F59E0B;
+}
+
+.local-fan-badge.badge-traveling .badge-label {
+  color: #F59E0B;
+}
+
+/* Compact variant */
+.local-fan-badge.compact {
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-2);
+}
+
+.local-fan-badge.compact .badge-icon {
+  font-size: var(--font-size-lg);
+}
+
+.local-fan-badge.compact .badge-description {
+  display: none;
+}
+
+.local-fan-badge.compact .badge-city {
+  display: none;
+}
+
+/* Animations */
+@keyframes badgeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
