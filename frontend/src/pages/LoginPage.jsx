@@ -2,16 +2,17 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { login, signup } from '../api/auth';
-import '../styles/styles.css';
+import './LoginPage.css';
 
 const SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Google's test site key
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState(null); // null | 'login' | 'signup'
+  const [mode, setMode] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaPassed, setCaptchaPassed] = useState(false);
   const recaptchaRef = useRef(null);
 
   function handleChange(e) {
@@ -22,6 +23,7 @@ export default function LoginPage() {
     setMode(newMode);
     setError('');
     setForm({ name: '', email: '', password: '' });
+    setCaptchaPassed(false);
     recaptchaRef.current?.reset();
   }
 
@@ -44,98 +46,188 @@ export default function LoginPage() {
         data = await signup(form.name, form.email, form.password, captchaToken);
       }
       localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('username', data.name || form.name);
       navigate('/dashboard');
     } catch (err) {
-      const msg =
-        err?.response?.data?.message || 'Server unavailable. Please try again later.';
+      const msg = err?.response?.data?.message || 'Server unavailable. Please try again later.';
       setError(msg);
       recaptchaRef.current?.reset();
+      setCaptchaPassed(false);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <>
-      {/* Mirrors login.html: hero banner */}
-      <div className="heroBanner">
-        <h1>TicketLeader</h1>
-        <img alt="" />
-      </div>
+    <div className="login-page">
+      {/* Hero Section */}
+      <section className="login-hero">
+        <div className="hero-content">
+          <div className="hero-logo">
+            <span className="logo-icon">TL</span>
+          </div>
+          <h1 className="hero-title">
+            <span className="text-gradient">TicketLeader</span>
+          </h1>
+          <p className="hero-subtitle">
+            The future of fair ticket purchasing.<br />
+            Skip the bots. Join the queue.
+          </p>
 
-      {/* Mirrors login.html: .lands with Login + Sign Up buttons */}
-      <div className="lands">
-        <div className="lands-buttons">
-          <button onClick={() => handleModeSwitch('login')}>Login</button>
-          <button onClick={() => handleModeSwitch('signup')}>Sign Up</button>
+          {/* Floating particles for visual effect */}
+          <div className="hero-particles">
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+          </div>
         </div>
 
-        {/* Inline form — appears below buttons when a mode is selected */}
-        {mode === 'login' && (
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            <ReCAPTCHA ref={recaptchaRef} sitekey={SITE_KEY} />
-            {error && <p className="auth-error">{error}</p>}
-            <button type="submit" disabled={loading}>
-              {loading ? 'Logging in…' : 'Login'}
-            </button>
-          </form>
-        )}
+        {/* Decorative gradient orbs */}
+        <div className="hero-orb hero-orb-1"></div>
+        <div className="hero-orb hero-orb-2"></div>
+      </section>
 
-        {mode === 'signup' && (
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            <ReCAPTCHA ref={recaptchaRef} sitekey={SITE_KEY} />
-            {error && <p className="auth-error">{error}</p>}
-            <button type="submit" disabled={loading}>
-              {loading ? 'Creating account…' : 'Sign Up'}
-            </button>
-          </form>
-        )}
-      </div>
+      {/* Auth Section */}
+      <section className="login-auth">
+        <div className="auth-container">
+          {!mode ? (
+            <div className="auth-welcome animate-fade-in">
+              <h2>Welcome</h2>
+              <p>Get access to exclusive events and secure your tickets with our gamified queue system.</p>
 
-      {/* Mirrors shared footer */}
-      <div className="footer">
-        <p>TicketLeader 2026 ©</p>
-      </div>
-    </>
+              <div className="auth-buttons">
+                <button
+                  className="btn-auth btn-auth-primary"
+                  onClick={() => handleModeSwitch('login')}
+                >
+                  Sign In
+                </button>
+                <button
+                  className="btn-auth btn-auth-secondary"
+                  onClick={() => handleModeSwitch('signup')}
+                >
+                  Create Account
+                </button>
+              </div>
+
+              <div className="auth-features">
+                <div className="feature">
+                  <span className="feature-icon">🎯</span>
+                  <span>Fair Queue System</span>
+                </div>
+                <div className="feature">
+                  <span className="feature-icon">🤖</span>
+                  <span>Bot-Free Experience</span>
+                </div>
+                <div className="feature">
+                  <span className="feature-icon">🎮</span>
+                  <span>Gamified Waiting</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="auth-form-container animate-slide-up">
+              <button className="btn-back" onClick={() => setMode(null)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+              </button>
+
+              <h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
+              <p>{mode === 'login' ? 'Sign in to access your tickets and events.' : 'Join the waitlist revolution today.'}</p>
+
+              <form className="auth-form" onSubmit={handleSubmit}>
+                {mode === 'signup' && (
+                  <div className="form-group">
+                    <label className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      className="input"
+                      placeholder="John Doe"
+                      value={form.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="input"
+                    placeholder="you@example.com"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    className="input"
+                    placeholder="••••••••"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={SITE_KEY}
+                  onChange={() => setCaptchaPassed(true)}
+                  onExpired={() => setCaptchaPassed(false)}
+                />
+
+                {error && (
+                  <div className="form-error">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={loading || !captchaPassed}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner spinner-sm"></span>
+                      {mode === 'login' ? 'Signing in...' : 'Creating account...'}
+                    </>
+                  ) : (
+                    mode === 'login' ? 'Sign In' : 'Create Account'
+                  )}
+                </button>
+              </form>
+
+              <p className="auth-switch">
+                {mode === 'login' ? (
+                  <>Don't have an account? <button onClick={() => handleModeSwitch('signup')}>Sign up</button></>
+                ) : (
+                  <>Already have an account? <button onClick={() => handleModeSwitch('login')}>Sign in</button></>
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="login-footer">
+        <p>&copy; 2026 TicketLeader. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }

@@ -2,50 +2,50 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 12px;
+  padding: var(--space-4) var(--space-6);
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
   border: 2px solid var(--trust-color);
-  box-shadow: 0 0 20px rgba(var(--trust-color), 0.3);
+  box-shadow: 0 0 20px rgba(var(--trust-color-rgb), 0.3);
 }
 
 .trust-icon {
-  font-size: 2.5rem;
-  margin-bottom: 8px;
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--space-2);
 }
 
 .trust-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .trust-label {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--trust-color);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .trust-score {
-  font-size: 0.875rem;
-  color: #8892b0;
-  margin-top: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
 }
 
 .trust-bar {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: var(--border-light);
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
 .trust-bar-fill {
   height: 100%;
   background: var(--trust-color);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   transition: width 0.5s ease-out;
 }

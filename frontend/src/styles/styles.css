@@ -1,289 +1,158 @@
-/* ── Reset ── */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   TICKET LEADER - MAIN STYLES
+   Import this file in main.jsx to apply global styles
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Base layout ── */
-body {
-  font-family: sans-serif;
-}
+/* Import Design System (CSS Variables & Base Styles) */
+@import './design-system.css';
 
-/* ── Dashboard: Header (from base.html) ── */
-.header {
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL APP STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Root App Container */
+#root {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 25px;
-  background-color: beige;
-  height: 50px;
+  flex-direction: column;
 }
 
-/* ── Dashboard: Navbar (from base.html) ── */
-.menubar {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 40px;
-  background-color: azure;
-  list-style: none;
+/* Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
-.menubar li {
-  cursor: pointer;
-  padding: 10px 0;
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
 }
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Image Handling */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Remove autofill background color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg-dark-2) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Text Utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--color-accent); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+
+/* Spacing Utilities */
+.m-0 { margin: 0; }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+
+/* Display Utilities */
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+
+/* Flex Utilities */
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+
+/* Width Utilities */
+.w-full { width: 100%; }
+.max-w-sm { max-width: var(--max-width-sm); }
+.max-w-md { max-width: var(--max-width-md); }
+.max-w-lg { max-width: var(--max-width-lg); }
+.max-w-xl { max-width: var(--max-width-xl); }
+
+/* Border Radius */
+.rounded { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* Overflow */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+
+/* Position */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+/* Z-Index */
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-50 { z-index: 50; }
+
+/* Cursor */
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Opacity */
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+/* Transitions */
+.transition { transition: all var(--transition-base); }
+.transition-fast { transition: all var(--transition-fast); }
+.transition-slow { transition: all var(--transition-slow); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEGACY SUPPORT (for backwards compatibility)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .body {
-  height: 100vh;
-  background-color: aquamarine;
-}
-
-/* ── Dashboard: Dropdowns (from base.html) ── */
-.dropdown {
-  display: none;
-  position: absolute;
-  background-color: azure;
-  list-style: none;
-  padding: 5px 0;
-  z-index: 100;
-}
-
-.dropdown li {
-  padding: 6px 16px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.dropdown li:hover {
-  background-color: #d0eaf5;
-}
-
-div.ticket {
-  position: relative;
-}
-div.ticket > li:hover ~ ul.dropdown.ticket,
-div.ticket > ul.dropdown.ticket:hover {
-  display: block;
-}
-
-div.business {
-  position: relative;
-}
-div.business > li:hover ~ ul.dropdown.live,
-div.business > ul.dropdown.live:hover {
-  display: block;
-}
-
-div.walkthrough {
-  position: relative;
-}
-div.walkthrough > li:hover ~ ul.dropdown.walkthrough,
-div.walkthrough > ul.dropdown.walkthrough:hover {
-  display: block;
-}
-
-/* ── Footer (shared) ── */
-.footer {
-  background-color: yellowgreen;
-  height: 20vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* ── Login: Hero banner (from login.html) ── */
-.heroBanner {
-  background-color: darksalmon;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60vh;
-}
-
-.heroBanner h1 {
-  color: white;
-  font-size: 3rem;
-}
-
-/* ── Login: Buttons row (from login.html) ── */
-.lands {
-  background-color: hotpink;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
-  min-height: 25vh;
-  flex-direction: column;
-}
-
-.lands-buttons {
-  display: flex;
-  gap: 25px;
-}
-
-.lands button {
-  height: 32px;
-  padding: 0 20px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  border: none;
-  border-radius: 4px;
-  background-color: white;
-}
-
-.lands button:hover {
-  background-color: #f0f0f0;
-}
-
-/* ── Login: Inline form (appears below the buttons) ── */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: white;
-  padding: 20px 28px;
-  border-radius: 8px;
-  width: 300px;
-}
-
-.auth-form input {
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.auth-form button[type="submit"] {
-  margin-top: 4px;
-  padding: 8px;
-  background-color: #ff69b4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.auth-form button[type="submit"]:hover {
-  background-color: #e05fa0;
-}
-
-.auth-error {
-  color: red;
-  font-size: 0.85rem;
-  text-align: center;
-}
-
-/* ── Dashboard: Events Grid ── */
-.dashboard-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
-.dashboard-title {
-  font-size: 2rem;
-  color: #1a1a2e;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.dashboard-subtitle {
-  color: #666;
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.events-loading,
-.no-events {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-
-.events-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.event-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.event-artist {
-  font-size: 0.85rem;
-  color: #667eea;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.event-name {
-  font-size: 1.35rem;
-  color: #1a1a2e;
-  margin-bottom: 16px;
-}
-
-.event-details {
-  margin-bottom: 16px;
-}
-
-.event-venue {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.event-city {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-}
-
-.event-date {
-  color: #764ba2;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.event-queue-info {
-  padding: 12px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 16px;
-}
-
-.queue-size {
-  color: #666;
-  font-size: 0.85rem;
-}
-
-.join-queue-btn {
-  width: 100%;
-  padding: 14px 24px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.join-queue-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  flex: 1;
+  background: var(--gradient-dark);
 }
