@@ -1,9 +1,7 @@
-import axios from 'axios';
-
-const API = axios.create({ baseURL: '/api/games' });
+import apiClient from './client';
 
 export async function submitGame(sessionId, gameType, questionId, answer, responseTime) {
-  const res = await API.post('/submit', {
+  const res = await apiClient.post('/games/submit', {
     sessionId,
     gameType,
     questionId,
@@ -14,16 +12,16 @@ export async function submitGame(sessionId, gameType, questionId, answer, respon
 }
 
 export async function getGameHistory(sessionId) {
-  const res = await API.get(`/history/${sessionId}`);
+  const res = await apiClient.get(`/games/history/${sessionId}`);
   return res.data;
 }
 
 export async function streamBehavior(sessionId, events) {
-  const res = await API.post('/behavior/stream', { sessionId, events });
+  const res = await apiClient.post('/games/behavior/stream', { sessionId, events });
   return res.data;
 }
 
 export async function getTrustBreakdown(sessionId) {
-  const res = await API.get(`/trust/${sessionId}`);
+  const res = await apiClient.get(`/games/trust/${sessionId}`);
   return res.data;
 }

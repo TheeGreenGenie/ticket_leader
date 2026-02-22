@@ -1,30 +1,46 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import './HomePage.css';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!localStorage.getItem('token')) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   return (
-    <div className="home-root">
-      <div className="header">
-        <h2>TicketLeader</h2>
-        <button
-          type="button"
-          onClick={() => navigate(isLoggedIn ? '/live-queue' : '/login')}
-        >
-          {isLoggedIn ? 'Live Queue' : 'Login'}
-        </button>
-      </div>
+    <div className="home-page">
+      <Header />
 
-      <Navbar />
+      <main className="home-main">
+        <section className="home-hero">
+          <div className="hero-bg" />
+          <div className="hero-content">
+            <span className="hero-badge">Welcome Back</span>
+            <h1>TicketLeader Home</h1>
+            <p>Jump back into live queues, track your tickets, or open the 3D map experience.</p>
+          </div>
+        </section>
 
-      <div className="body" />
+        <section className="home-actions">
+          <button type="button" onClick={() => navigate('/live-queue')}>
+            Open Live Queue
+          </button>
+          <button type="button" onClick={() => navigate('/my-tickets')}>
+            Open My Tickets
+          </button>
+          <button type="button" onClick={() => navigate('/stadium')}>
+            Open 3D Map
+          </button>
+        </section>
+      </main>
 
-      <div className="footer">
-        <p>TicketLeader 2026 ©</p>
-      </div>
+      <Footer />
     </div>
   );
 }

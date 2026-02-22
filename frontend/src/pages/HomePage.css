@@ -1,53 +1,84 @@
-.home-root .header {
+.home-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 25px;
-  background-color: beige;
+  flex-direction: column;
+  background: var(--gradient-dark);
 }
 
-.home-root .header button {
-  height: 30px;
-  cursor: pointer;
+.home-main {
+  flex: 1;
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+  padding: 32px 0 56px;
 }
 
-.home-root .menubar {
-  display: flex;
-  justify-content: space-between;
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-dark-2);
+  margin-bottom: 24px;
+  min-height: 210px;
+}
+
+.home-hero .hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 22%, rgba(59, 130, 246, 0.24), transparent 45%),
+    radial-gradient(circle at 80% 28%, rgba(34, 211, 238, 0.2), transparent 42%);
+}
+
+.home-hero .hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 34px;
+}
+
+.home-hero .hero-badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-accent);
+  color: var(--color-accent);
+  background: rgba(34, 211, 238, 0.1);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.home-hero h1 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-4xl);
+}
+
+.home-hero p {
   margin: 0;
-  padding: 10px 40px;
-  list-style: none;
-  background-color: azure;
+  color: var(--text-secondary);
+  max-width: 700px;
 }
 
-.home-root .body {
-  min-height: 60vh;
-  background-color: aquamarine;
+.home-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
 }
 
-.home-root .footer {
-  background-color: yellowgreen;
-  min-height: 18vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.home-actions button {
+  border: 1px solid var(--border-primary);
+  background: var(--gradient-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.home-root .dropdown {
-  display: none;
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 8px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.home-root .ticket > li:hover ~ ul.dropdown.ticket,
-.home-root .ticket > ul.dropdown:hover,
-.home-root .walkthrough > li:hover ~ ul.dropdown.walkthrough,
-.home-root .walkthrough > ul.dropdown:hover,
-.home-root .business > li:hover ~ ul.dropdown.live,
-.home-root .business > ul.dropdown:hover {
-  display: block;
+.home-actions button:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }

@@ -7,10 +7,13 @@ import MyTicketsPage from './pages/MyTicketsPage';
 import StadiumPage from './pages/StadiumPage';
 
 export default function App() {
+  const isLoggedIn = !!localStorage.getItem('token');
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={isLoggedIn ? <HomePage /> : <LoginPage />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/live-queue" element={<DashboardPage />} />
         <Route path="/my-tickets" element={<MyTicketsPage />} />
