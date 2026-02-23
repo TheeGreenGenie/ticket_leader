@@ -28,8 +28,9 @@ npm-debug.log*
 .vite/
 
 # Large binary files — store locally or via LFS
-*.pptx
+# *.pptx
 *.mp4
 *.mov
 ~$*
 demo_videos/
+.gitignore
