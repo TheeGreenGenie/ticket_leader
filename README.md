@@ -89,3 +89,8 @@ App → `http://127.0.0.1:4001` · API → `http://127.0.0.1:5001/api/health`
 For full architecture, API reference, bot detection internals, trust score algorithm, 3D stadium implementation, and deployment config:
 
 📄 **[TECHNICAL.md](./TECHNICAL.md)**
+
+---
+
+## AI Logs Index
+Supporting planning docs are indexed in [i_logs](./ai_logs) (one path per line).
