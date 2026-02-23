@@ -4,6 +4,14 @@
 
 Built for BisonHacks 2026 by **Mason Brogden · Daniel Adewale · Solomon Shasanmi · Joseph Lewis**
 
+![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?logo=mongodb)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-010101?logo=socket.io)
+![Three.js](https://img.shields.io/badge/Three.js-0.183-000000?logo=three.js)
+
+### 🌐 [Live Site → ticket-leader.vercel.app](https://ticket-leader.vercel.app/live-queue)
+
 ---
 
 ## Three Things That Set Us Apart
@@ -78,6 +86,6 @@ App → `http://127.0.0.1:4001` · API → `http://127.0.0.1:5001/api/health`
 
 ## Technical Deep-Dive
 
-For full architecture details, API reference, bot detection internals, trust score algorithm, 3D stadium implementation, and deployment configuration:
+For full architecture, API reference, bot detection internals, trust score algorithm, 3D stadium implementation, and deployment config:
 
 📄 **[TECHNICAL.md](./TECHNICAL.md)**
