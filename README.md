@@ -26,7 +26,9 @@ Built for BisonHacks 2026 by **Mason Brogden · Daniel Adewale · Solomon Shasan
 
 ## Pitch Deck
 
-📊 **[TicketLeader.pptx](./TicketLeader.pptx)** — 15-slide investor deck with live demo videos, market analysis, break-even by stadium, and competitive moat.
+[![TicketLeader Deck Preview](./docs/deck/deck-cover.jpg)](./docs/deck/TicketLeader-small.pdf)
+
+[TicketLeader Deck (PDF)](./docs/deck/TicketLeader-small.pdf) - 15-slide investor deck with live demo videos, market analysis, break-even by stadium, and competitive moat.
 
 ---
 
