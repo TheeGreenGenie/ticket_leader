@@ -93,5 +93,6 @@ For full architecture, API reference, bot detection internals, trust score algor
 ---
 
 ## AI Logs Index
-Supporting planning docs are indexed in [ai_logs](./ai_logs) (one path per line).
+Supporting planning docs are indexed in [ai_logs/index.txt](./ai_logs/index.txt)
+ (one path per line).
 
